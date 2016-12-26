@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MathJax Mathematics Editor Keyboard</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  <style> 
+    .mj-ed-display {
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      font-size: 2em;
+      padding: 0.5em 0.8em;
+    }
+    
+    .mj-ed-display.isFocused {
+      border-color: #007fff;
+    }
+  </style>
+</head>
+<body>
+  <textarea id="editor"></textarea>
+
+  <script type='text/x-mathjax-config'>
+    MathJax.Hub.Config({
+        showMathMenu: false,
+        messageStyle: 'none'
+    });
+  </script>
+
+  <script src="../dist/MathJaxEditorKeyboard.js"></script>
+  <script>
+    window.onload = function () {
+      const editor = new MathJaxEditorKeyboard({
+        el: '#editor'
+      });
+    };
+  </script>
+</body>
+</html>
