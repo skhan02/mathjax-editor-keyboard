@@ -12,6 +12,13 @@ class Key {
     }
     return `<i class="material-icons">${this.key.$label}</i>`;
   }
+
+  getClickListener() {
+    if (!this.key || !this.key.onClick) {
+      return () => null;
+    }
+    return this.key.onClick;
+  }
 }
 
 export default Key;
