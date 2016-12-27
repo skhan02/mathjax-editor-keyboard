@@ -1,13 +1,17 @@
 import MathJaxEditor from 'mathjax-editor';
-import loadStyles from './loadStyles';
-import keyboard from './keyboard';
+import { addClass, removeClass } from 'mathjax-editor/src/utils';
+import { applyStyles, emptyElement } from './utils';
+import styles from './styles';
+import keys from './keys';
 
 let Element = null;
-const { keyRows, keyColumns, getKey } = keyboard;
+let Typeset = null;
+const { keyRows, keyColumns, getKey, keyList } = keys;
 
 class MathJaxEditorKeyboard {
   constructor(options) {
     Element = Element || MathJax.HTML.Element;
+    Typeset = Typeset || MathJax.Hub.Typeset;
 
     const $container = Element('div', { className: 'mjk-container' });
     const $keyboard = Element('div', { className: 'mjk-keyboard' });
@@ -16,29 +20,35 @@ class MathJaxEditorKeyboard {
     document.body.appendChild($container);
 
     const editor = new MathJaxEditor(options);
-    editor.on('focus', this.showKeyboard.bind(this));
-    editor.on('blur', this.hideKeyboard.bind(this));
+    // editor.on('focus', this.showKeyboard.bind(this));
+    // editor.on('blur', this.hideKeyboard.bind(this));
 
-    this.$keyboard = $keyboard;
     this.editor = editor;
+    this.$container = $container;
+    this.$keyboard = $keyboard;
+    this.$editorContainer = editor.core.$container;
+    this.$editorContainerParent = editor.core.$container.parentNode;
+    this.$editorInput = editor.core.$input;
 
-    setTimeout(() =>
-      this.showKeyboard()
-    );
+    this.render()
   }
 
-  showKeyboard() {
-    // This should be at least 320px, 20 for padding.
-    const width = this.$keyboard.offsetWidth - 20;
+  render() {
+    const { $keyboard, editor } = this;
+    const keyboardWidth = $keyboard.offsetWidth;
+    const width = keyboardWidth - 20; // at least 320px.
     const keyWidth = width / keyColumns;
     const keyWidthPx = `${keyWidth}px`;
-    let i = 0;
-    for (; i < keyRows; i++) {
+
+    emptyElement($keyboard);
+
+    keyList.forEach((rows, i) => {
       const $row = Element('div', { className: 'mjk-keyRow' });
-      let j = 0;
-      for (j; j < keyColumns; j++) {
+
+      rows.forEach((column, j) => {
         const key = getKey(i, j);
-        const $key = Element('div', {
+        const listener = key.getClickListener();
+        const $key = Element('button', {
           className: 'mjk-key',
           style: {
             fontSize: '16px',
@@ -46,14 +56,45 @@ class MathJaxEditorKeyboard {
             width: keyWidthPx
           }
         });
+
         $key.innerHTML = key.getLabel();
+        $key.addEventListener('click', () => {
+          listener(editor);
+          this.updateInputElement();
+        });
+
         $row.appendChild($key);
-      }
-      this.$keyboard.append($row);
-    }
+      });
+
+      $keyboard.appendChild($row);
+    })
+
+    Typeset($keyboard);
+    this.updateInputElement();
   }
 
-  hideKeyboard() {}
+  updateInputElement() {
+    const { $keyboard, $container, $editorContainer, $editorInput } = this;
+    const keyboardWidth = $keyboard.offsetWidth;
+    const { top } = $keyboard.getBoundingClientRect();
+    
+    // Below 640px is mobile version
+    if (keyboardWidth < 640) {
+      $editorInput.setAttribute('readonly', 'true');
+      $container.appendChild($editorContainer);
+      addClass($editorContainer, 'mjk-input');
+
+      applyStyles($editorContainer, {
+        fontSize: '12px',
+        left: 0,
+        width: `${keyboardWidth}px`
+      });
+
+      applyStyles($editorContainer, {
+        top: `${top - $editorContainer.offsetHeight}px`
+      });
+    }
+  }
 }
 
 module.exports = MathJaxEditorKeyboard;
