@@ -8,7 +8,11 @@
  */
 export function applyStyles($el, styles) {
   Object.keys(styles).forEach(property => {
-    $el.style[property] = styles[property];
+    let value = styles[property];
+    if (typeof value === 'number') {
+      value = `${value}px`;
+    }
+    $el.style[property] = value;
   });
 }
 
@@ -21,6 +25,24 @@ export function applyStyles($el, styles) {
  */
 export function emptyElement($el) {
   while ($el.firstChild) {
-    $el.removeChild($el);
+    $el.removeChild($el.firstChild);
   }
+}
+
+/**
+ * Find a parent node.
+ * 
+ * @param {DOMElement} $el
+ * 
+ * @return {Boolean}
+ */
+export function findNode($at, $el) {
+  let $parent = $at;
+  while ($parent) {
+    if ($parent === $el) {
+      return true;
+    }
+    $parent = $parent.parentNode;
+  }
+  return false;
 }
