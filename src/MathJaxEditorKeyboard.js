@@ -10,6 +10,8 @@ class MathJaxEditorKeyboard {
    */
   constructor(options) {
     const core = new Core(options);
+
+    this.editor = core.editor;
   }
 
   /**
@@ -18,7 +20,7 @@ class MathJaxEditorKeyboard {
    * @return {String}
    */
   getValue() {
-    return core.editor.getValue();
+    return this.editor.getValue();
   }
 }
 
