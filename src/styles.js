@@ -10,12 +10,18 @@ function onLoad() {
     },
 
     '.mjk-keyboard': {  
-      'background-color': '#11255e',
+      'background-color': '#f1f1f1',
+      border: '1px solid #ccc',
       bottom: 0,
       left: 0,
       'padding': '1em 0',
       position: 'absolute',
       width: '320px'
+    },
+
+    '.mjk-keyboard.isMobile': {
+      border: 'none',
+      'border-top': '1px solid #ccc'
     },
 
     '.mjk-keyRow': {
@@ -29,7 +35,7 @@ function onLoad() {
       'align-items': 'center',
       'background-color': 'transparent',
       border: 'none',
-      color: '#fff',
+      color: '#333',
       display: 'flex',
       float: 'left',
       'justify-content': 'center',
@@ -39,7 +45,7 @@ function onLoad() {
     '.mjk-input': {
       'background-color': '#fff',
       position: 'absolute !important',
-      // overflow: 'scroll'
+      'overflow-x': 'scroll'
     },
 
     '.mjk-input .mj-ed-display': {
