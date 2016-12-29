@@ -5,7 +5,7 @@
   "main": "src/MathJaxEditorKeyboard.js",
   "scripts": {
     "dev": "webpack --watch",
-    "build": "webpack && uglifyjs ./dist/MathJaxEditor.js -c -m -o ./dist/MathJaxEditorKeyboard.min.js "
+    "build": "webpack && uglifyjs ./dist/MathJaxEditorKeyboard.js -c -m -o ./dist/MathJaxEditorKeyboard.min.js "
   },
   "author": "Ian Lucas <ianlucas_ferreira@hotmail.com>",
   "repository": {
