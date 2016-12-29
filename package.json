@@ -1,6 +1,6 @@
 {
   "name": "mathjax-editor-keyboard",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "A Mathematics editor on top of MathJax.",
   "main": "src/MathJaxEditorKeyboard.js",
   "scripts": {
