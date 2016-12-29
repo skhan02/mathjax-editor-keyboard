@@ -82,167 +82,656 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 8);
+/******/ 	return __webpack_require__(__webpack_require__.s = 14);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Editor__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__extendMathJax__ = __webpack_require__(5);
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.mustFindElement = mustFindElement;
+exports.insertBetween = insertBetween;
+exports.removeClass = removeClass;
+exports.addClass = addClass;
+exports.toArray = toArray;
+exports.isAny = isAny;
+exports.inArray = inArray;
+exports.repeat = repeat;
+exports.removeFragment = removeFragment;
+exports.listToCharacterRegex = listToCharacterRegex;
+/**
+ * Tries to find the specified element. If it fails, an error is thrown.
+ * 
+ * @param {DOMElement|string} el - An element or a selector.
+ * 
+ * @return {DOMElement}
+ */
+function mustFindElement(el) {
+  var error = new Error('You must define a target element.');
 
+  if (!el) {
+    throw error;
+  }
 
-window.addEventListener('load', __WEBPACK_IMPORTED_MODULE_1__extendMathJax__["a" /* default */]);
+  if (typeof el === 'string') {
+    var $el = document.querySelector(el);
+    if (!$el) {
+      throw error;
+    }
+    return $el;
+  }
+
+  // Yeah, we just assume an element was given...
+  return el;
+}
 
 /**
- * This is the MathJaxEditor class.
+ * Insert a text in the middle of the given string.
  * 
- * It has an API on top of the Editor class.
+ * @param {String} string
+ * @param {Number} index
+ * @param {String} fragment
+ * 
+ * @return {String}
  */
-class MathJaxEditor {
+function insertBetween(string, index, fragment) {
+  var before = string.slice(0, index);
+  var after = string.slice(index);
+  return before + fragment + after;
+}
+
+/**
+ * Remove a class of an element.
+ * 
+ * @param {DOMElement} $el
+ * @param {String} className
+ * 
+ * @return {Void}
+ */
+function removeClass($el, className) {
+  var classes = $el.className.split(' ');
+  var finalValue = '';
+
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
+
+  try {
+    for (var _iterator = classes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var c = _step.value;
+
+      if (c !== className) {
+        finalValue += ' ' + c;
+      }
+    }
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion && _iterator.return) {
+        _iterator.return();
+      }
+    } finally {
+      if (_didIteratorError) {
+        throw _iteratorError;
+      }
+    }
+  }
+
+  $el.className = finalValue.trim();
+}
+
+/**
+ * Add a class to an element.
+ * 
+ * @param {DOMElement} $el
+ * @param {String} className
+ * 
+ * @return {Void}
+ */
+function addClass($el, className) {
+  var classes = $el.className.split(' ');
+  if (!~classes.indexOf(className)) {
+    $el.className += ' ' + className;
+  }
+  $el.className = $el.className.trim();
+}
+
+/**
+ * Converts a DOM node list to array.
+ * 
+ * @param {DOMNodeList}
+ * 
+ * @return {Array}
+ */
+function toArray(children) {
+  var slice = [].slice;
+  return slice.call(children);
+}
+
+/**
+ * Check if the needle is found in haystack.
+ * 
+ * @param {Mixed} needle
+ * @param {Array} haystack
+ * 
+ * @return {Boolean}
+ */
+function isAny(needle, haystack) {
+  return !!~haystack.indexOf(needle);
+}
+
+/**
+ * Same as `isAny`. Just better naming.
+ * 
+ * @see isAny
+ */
+function inArray(needle, haystack) {
+  return isAny(needle, haystack);
+}
+
+/**
+ * Repeat a string.
+ * 
+ * @param {String} str
+ * @param {Number} count
+ * 
+ * @return {String}
+ */
+function repeat(str, count) {
+  var result = '';
+  var double = str + str;
+  var isOdd = count % 2 !== 0;
+  var length = Math.floor(count / 2);
+  var i = 0;
+  for (; i < length; i++) {
+    result += double;
+  }
+
+  if (isOdd) {
+    result += str;
+  }
+
+  return result;
+}
+
+/**
+ * Remove part of a string.
+ * 
+ * >> removeFragment("0123456", 1, 3);
+ * << "03456"
+ * 
+ * So, when start 1 and end 3, "0123456"
+ *                               ^^
+ *                             Removed
+ */
+function removeFragment(str, start, end) {
+  return str.slice(0, start) + str.slice(end);
+}
+
+/**
+ * Convert a list to a character regex.
+ * 
+ * @param {Array} list
+ * 
+ * @return {RegExp}
+ */
+function listToCharacterRegex(list) {
+  var chars = list.map(function (char) {
+    return '\\' + char;
+  }).join('');
+  return new RegExp('^[' + chars + ']$');
+}
+
+/***/ },
+/* 1 */
+/***/ function(module, exports) {
+
+"use strict";
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var EventBus = function () {
   /**
-   * Creates an instance of Editor.
+   * This is a simple Event Bus to register/trigger events.
    * 
    * @constructor
    */
-  constructor(options) {
-    const editor = new __WEBPACK_IMPORTED_MODULE_0__Editor__["a" /* default */](options);
+  function EventBus() {
+    _classCallCheck(this, EventBus);
 
-    this.editor = editor;
-    this.version = '1.1.7';
+    this.registry = {};
   }
 
   /**
-   * Blur the editor.
-   * 
-   * @return {Void}
-   */
-  blur() {
-    this.editor.blur();
-  }
-
-  /**
-   * Focus the editor.
-   * 
-   * @return {Void}
-   */
-  focus() {
-    this.editor.focus();
-  }
-
-  /**
-   * This inserts a command into the editor.
-   * 
-   * @param {String} command
-   * @param {Number} blockCount
-   * @param {Boolean} brackets
-   * 
-   * @return {Void}
-   */
-  insertCommand(command, blockCount = 1, brackets = false) {
-    this.editor.insertCommand(command, blockCount, brackets);
-  }
-
-  /**
-   * Insert a piece of text in editor's value.
-   * 
-   * @param {String} value
-   * 
-   * @return {Void}
-   */
-  insert(value) {
-    this.editor.insert(value);
-  }
-
-  /**
-   * Get editor's jax.
-   * 
-   * @deprecated
-   * 
-   * @return {String}
-   */
-  getJax() {
-    console.warn('[deprecated] getJax is deprecated, use getValue instead.')
-    return this.editor.value;
-  }
-
-  /**
-   * Get editor's value.
-   * 
-   * @deprecated
-   * 
-   * @return {String}
-   */
-  getValue() {
-    return this.editor.value;
-  }
-
-  /**
-   * Move the cursor to the left.
-   * 
-   * @return {Void}
-   */
-  moveCursorLeft() {
-    this.editor.moveCursorLeft();
-  }
-
-  /**
-   * Move the cursor to the right.
-   * 
-   * @return {Void} 
-   */
-  moveCursorRight() {
-    this.editor.moveCursorRight();
-  }
-
-  /**
-   * Erases the character before the cursor.
-   * 
-   * @return {Void}
-   */
-  erase() {
-    this.editor.erase();
-  }
-
-  /**
-   * Listen to an event to be triggered by the Editor.
+   * Listen to an event to be triggered.
    * 
    * @param {String} type
    * @param {Function} listener
    * 
    * @return {Void}
    */
-  on(type, listener) {
-    this.editor.on(type, listener);
-  }
-}
 
-module.exports = MathJaxEditor;
+
+  _createClass(EventBus, [{
+    key: "on",
+    value: function on(type, listener) {
+      this.registry[type] = (this.registry[type] || []).concat(listener);
+    }
+
+    /**
+     * Trigger an event.
+     * 
+     * @param {String} type
+     * @param {Mixed} ...rest
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: "trigger",
+    value: function trigger(type) {
+      for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        rest[_key - 1] = arguments[_key];
+      }
+
+      if (this.registry[type]) {
+        this.registry[type].forEach(function (listener) {
+          return listener.apply(undefined, rest);
+        });
+      }
+    }
+  }]);
+
+  return EventBus;
+}();
+
+exports.default = EventBus;
 
 /***/ },
-/* 1 */
+/* 2 */
+/***/ function(module, exports) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = {
+  cursorTex: '{\\cursor}',
+
+  emptyTex: '\\isEmpty',
+
+  number: /^[0-9]$/,
+
+  variable: /^[a-z]$/,
+
+  nearClosureHaystack: ['}', ']'],
+
+  operators: ['+', '-', '=', '<', '>', ',', '.', ':', ';', '?', '(', ')', '[', ']'],
+
+  escapedOperators: ['{', '}', '%'],
+
+  escType: {
+    '%': 'mi'
+  }
+};
+
+/***/ },
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__EventBus__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Placer__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Iterator__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(7);
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _mathjaxEditor = __webpack_require__(5);
+
+var _mathjaxEditor2 = _interopRequireDefault(_mathjaxEditor);
+
+var _utils = __webpack_require__(0);
+
+var _utils2 = __webpack_require__(13);
+
+var _styles = __webpack_require__(12);
+
+var _styles2 = _interopRequireDefault(_styles);
+
+var _keys = __webpack_require__(11);
+
+var _keys2 = _interopRequireDefault(_keys);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var keyRows = _keys2.default.keyRows,
+    keyColumns = _keys2.default.keyColumns,
+    getKey = _keys2.default.getKey,
+    keyList = _keys2.default.keyList;
+
+var keyboardWidth = 320;
+
+var Core = function () {
+  /**
+   * Initiates the keyboard.
+   * 
+   * @param {Object} options - See at MathJax Editor docs.
+   * 
+   * @constructor
+   */
+  function Core(options) {
+    _classCallCheck(this, Core);
+
+    var Element = MathJax.HTML.Element;
+
+    var $container = Element('div', { className: 'mjk-container' });
+    var $keyboard = Element('div', { className: 'mjk-keyboard' });
+    var viewportWidth = window.innerWidth;
+
+    $container.appendChild($keyboard);
+    document.body.appendChild($container);
+
+    var editor = new _mathjaxEditor2.default(options);
+
+    this.editor = editor;
+    this.isMobile = viewportWidth < 640;
+    this.isVisible = false;
+    this.$container = $container;
+    this.$keyboard = $keyboard;
+    this.$editorContainer = editor.core.$container;
+    this.$editorContainerParent = editor.core.$container.parentNode;
+    this.$editorInput = editor.core.$input;
+
+    document.addEventListener('click', this.handleDocumentClick.bind(this));
+
+    this.hideKeyboard();
+  }
+
+  /**
+   * Create all keys for the keyboard.
+   * 
+   * @return {Void}
+   */
 
 
+  _createClass(Core, [{
+    key: 'render',
+    value: function render() {
+      var _this = this;
 
+      var Element = MathJax.HTML.Element;
+      var $keyboard = this.$keyboard,
+          editor = this.editor;
 
+      var keyWidth = (keyboardWidth - 20) / keyColumns;
+      var keyWidthPx = keyWidth + 'px';
 
-const KEY_BACKSPACE = 8;
-const KEY_ENTER = 13;
-const KEY_LEFT = 37;
-const KEY_RIGHT = 39;
-const KEY_DELETE = 46;
+      (0, _utils2.emptyElement)($keyboard);
+      $keyboard.style.width = keyboardWidth + 'px';
 
-class Editor {
+      keyList.forEach(function (rows, i) {
+        var $row = Element('div', { className: 'mjk-keyRow' });
+
+        rows.forEach(function (column, j) {
+          var key = getKey(i, j);
+          var listener = key.getClickListener();
+          var $key = Element('button', {
+            className: 'mjk-key',
+            style: {
+              fontSize: '16px',
+              height: keyWidthPx,
+              width: keyWidthPx
+            }
+          });
+
+          $key.innerHTML = key.getLabel();
+          $key.addEventListener('click', function () {
+            listener(editor);
+            _this.updateInputElement();
+          });
+
+          $row.appendChild($key);
+        });
+
+        $keyboard.appendChild($row);
+      });
+
+      MathJax.Hub.Typeset($keyboard);
+      this.updateInputElement();
+      this.updateContainerElement();
+    }
+
+    /**
+     * Update the math input element to fit the screen.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'updateInputElement',
+    value: function updateInputElement() {
+      var $keyboard = this.$keyboard,
+          $container = this.$container,
+          $editorContainer = this.$editorContainer,
+          $editorInput = this.$editorInput,
+          $editorContainerParent = this.$editorContainerParent;
+
+      var viewportWidth = window.innerWidth;
+
+      var _$keyboard$getBoundin = $keyboard.getBoundingClientRect(),
+          top = _$keyboard$getBoundin.top;
+
+      if (this.isMobile) {
+        var padding = (Math.max(viewportWidth, 320) - keyboardWidth) / 2;
+
+        $editorInput.setAttribute('readonly', 'true');
+        $container.appendChild($editorContainer);
+        (0, _utils.addClass)($editorContainer, 'mjk-input');
+        (0, _utils.addClass)($keyboard, 'isMobile');
+
+        (0, _utils2.applyStyles)($keyboard, {
+          paddingLeft: padding,
+          paddingRight: padding
+        });
+
+        (0, _utils2.applyStyles)($editorContainer, {
+          fontSize: 12,
+          left: 0,
+          width: viewportWidth
+        });
+
+        (0, _utils2.applyStyles)($editorContainer, {
+          top: top - $editorContainer.offsetHeight
+        });
+      } else {
+        (0, _utils.removeClass)($keyboard, 'isMobile');
+        this.appendEditorToItsOriginalParent();
+      }
+    }
+
+    /**
+     * Append the editor to its original parent.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'appendEditorToItsOriginalParent',
+    value: function appendEditorToItsOriginalParent() {
+      var $editorContainer = this.$editorContainer,
+          $editorContainerParent = this.$editorContainerParent;
+
+      (0, _utils.removeClass)($editorContainer, 'mjk-input');
+      $editorContainerParent.appendChild($editorContainer);
+    }
+
+    /**
+     * Update the container element position and size.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'updateContainerElement',
+    value: function updateContainerElement() {
+      var $keyboard = this.$keyboard,
+          $container = this.$container,
+          $editorContainer = this.$editorContainer;
+
+      var viewportWidth = window.innerWidth;
+      var height = void 0,
+          left = void 0,
+          top = void 0,
+          width = void 0;
+
+      if (this.isMobile) {
+        height = '100%';
+        left = 0;
+        top = 0;
+        width = '100%';
+      } else {
+        var editorContainerBouncing = $editorContainer.getBoundingClientRect();
+        var keyboardBounding = $keyboard.getBoundingClientRect();
+        var margin = 16;
+        var leftPos = editorContainerBouncing.left + editorContainerBouncing.width / 2 - keyboardBounding.width / 2;
+        height = keyboardBounding.height;
+        left = leftPos;
+        top = editorContainerBouncing.top + editorContainerBouncing.height + margin;
+        width = keyboardBounding.width;
+      }
+
+      (0, _utils2.applyStyles)($container, {
+        height: height,
+        left: left,
+        top: top,
+        width: width
+      });
+    }
+
+    /**
+     * Show the keyboard.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'showKeyboard',
+    value: function showKeyboard() {
+      if (this.isVisible) {
+        return;
+      }
+      this.isVisible = true;
+      this.$container.style.display = 'block';
+      this.render();
+    }
+
+    /**
+     * Hide the keyboard.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'hideKeyboard',
+    value: function hideKeyboard() {
+      this.isVisible = false;
+      this.editor.blur();
+      this.$container.style.display = 'none';
+      this.appendEditorToItsOriginalParent();
+    }
+
+    /**
+     * Handle the click on `document`.
+     * 
+     * @param {ClickEvent} e
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'handleDocumentClick',
+    value: function handleDocumentClick(e) {
+      var $container = this.$container,
+          $editorContainer = this.$editorContainer;
+
+      var $target = e.target;
+
+      if (this.isMobile && $target === $container) {
+        return this.hideKeyboard();
+      }
+      if ((0, _utils2.findNode)($target, $editorContainer)) {
+        return this.showKeyboard();
+      }
+      if (!(0, _utils2.findNode)($target, $container)) {
+        return this.hideKeyboard();
+      }
+    }
+  }]);
+
+  return Core;
+}();
+
+exports.default = Core;
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _EventBus = __webpack_require__(1);
+
+var _EventBus2 = _interopRequireDefault(_EventBus);
+
+var _Placer = __webpack_require__(6);
+
+var _Placer2 = _interopRequireDefault(_Placer);
+
+var _Tex = __webpack_require__(7);
+
+var _Tex2 = _interopRequireDefault(_Tex);
+
+var _utils = __webpack_require__(0);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var KEY_BACKSPACE = 8;
+var KEY_ENTER = 13;
+var KEY_LEFT = 37;
+var KEY_RIGHT = 39;
+var KEY_DELETE = 46;
+
+var Editor = function () {
   /**
    * This is the main class of the Editor.
    * 
@@ -257,14 +746,31 @@ class Editor {
    * 
    * @constructor
    */
-  constructor({ el, debug = false, focusClass = 'isFocused', newLine = false, value = '' }) {
-    const Element = MathJax.HTML.Element;
+  function Editor(options) {
+    var _this = this;
 
-    const $el = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__utils__["a" /* mustFindElement */])(el);
-    const $container = Element('div', { className: 'mj-ed-container' });
-    const $input = Element('input', { className: 'mj-ed-input' });
-    const $display = Element('div', { className: 'mj-ed-display' }, [`\\({\\cursor}${value}\\)`]);
-    const $debug = Element('pre', { className: 'mj-ed-debug' }, ['|']);
+    _classCallCheck(this, Editor);
+
+    var el = options.el,
+        _options$debug = options.debug,
+        debug = _options$debug === undefined ? false : _options$debug,
+        _options$focusClass = options.focusClass,
+        focusClass = _options$focusClass === undefined ? 'isFocused' : _options$focusClass,
+        _options$newLine = options.newLine,
+        newLine = _options$newLine === undefined ? false : _options$newLine,
+        _options$value = options.value,
+        value = _options$value === undefined ? '' : _options$value,
+        _options$scroll = options.scroll,
+        scroll = _options$scroll === undefined ? false : _options$scroll;
+
+
+    var Element = MathJax.HTML.Element;
+
+    var $el = (0, _utils.mustFindElement)(el);
+    var $container = Element('div', { className: 'mj-ed-container' });
+    var $input = Element('input', { className: 'mj-ed-input' });
+    var $display = Element('div', { className: 'mj-ed-display' }, ['\\({\\cursor}' + value + '\\)']);
+    var $debug = Element('pre', { className: 'mj-ed-debug' }, ['|']);
 
     $el.parentNode.replaceChild($container, $el);
     $container.appendChild($input);
@@ -278,29 +784,33 @@ class Editor {
     document.body.addEventListener('click', this.handleBodyClick.bind(this));
 
     $display.style.opacity = 0;
+    $display.style.overflowX = scroll ? 'scroll' : 'hidden';
     $debug.style.display = debug ? 'block' : 'none';
 
-    MathJax.Hub.Queue(
-      ['Typeset', MathJax.Hub, $display], () => {
-        this.jaxElement = MathJax.Hub.getAllJax($display)[0];
-      }, () => {
-        $display.style.opacity = 1;
-        $display.style.minHeight = `${$display.offsetHeight}px`;
-        this.update(value, { hidden: true });
-      }
-    );
+    MathJax.Hub.Queue(function () {
+      return MathJax.Hub.Typeset($display);
+    }, function () {
+      return _this.jaxElement = MathJax.Hub.getAllJax($display)[0];
+    }, function () {
+      $display.style.opacity = 1;
+      $display.style.minHeight = $display.offsetHeight + 'px';
+      _this.update({ cursorHidden: true });
+    });
 
     this.$container = $container;
     this.$debug = $debug;
     this.$display = $display;
     this.$input = $input;
-    this.bus = new __WEBPACK_IMPORTED_MODULE_0__EventBus__["a" /* default */];
-    this.cursor = 0;
+    this.bus = new _EventBus2.default();
+    this.cursorIndex = 0;
+    this.lastCursorTimeout = null;
     this.placer = null;
     this.debug = debug;
     this.focusClass = focusClass;
     this.newLine = newLine;
+    this.tex = new _Tex2.default(value, 0);
     this.value = value;
+    this.lastValue = value;
   }
 
   /**
@@ -312,248 +822,194 @@ class Editor {
    * 
    * @return {Void}
    */
-  update(value = this.value, cursorOptions = {}) {
-    const cursor = this.cursor;
-    const valueWithCursor = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__utils__["b" /* insertBetween */])(value, cursor, '{\\cursor}')
-      .replace(/\d/g, n => `{${n}}`)
-      .replace(/\,/g, comma => `{${comma}}`)
-      .replace(/\{\}/g, '{\\isEmpty}')
-      .replace(/\[\]/g, '[\\isEmpty]')
-      .replace(/\{\{\\cursor\}\}/g, '{{\\cursor}\\isEmpty}')
-      .replace(/\[\{\\cursor\}\]/g, '[{\\cursor}\\isEmpty]');
 
-    if (this.debug) {
-      this.$debug.innerHTML = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__utils__["b" /* insertBetween */])(value, cursor, '|');
-    }
 
-    this.updateJaxElement(
-      valueWithCursor, () => {
-        setTimeout(() => {
-          this.placer = __WEBPACK_IMPORTED_MODULE_1__Placer__["a" /* default */].read(this, cursor => {
-            console.log(`The cursor should be placed at ${cursor}`);
-            this.cursor = cursor;
-            this.update();
+  _createClass(Editor, [{
+    key: 'update',
+    value: function update() {
+      var _this2 = this;
+
+      var cursorOptions = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var cursorIndex = this.cursorIndex,
+          value = this.value;
+
+      var tex = this.tex;
+
+      if (value !== this.lastValue) {
+        tex = new _Tex2.default(value, cursorIndex);
+        this.tex = tex;
+      }
+
+      if (this.debug) {
+        this.$debug.innerHTML = (0, _utils.insertBetween)(value, cursorIndex, '|');
+      }
+
+      this.updateJaxElement(tex.displayTex, function () {
+        setTimeout(function () {
+          var placer = new _Placer2.default(_this2);
+          placer.on('setCursor', function (index) {
+            _this2.debug && console.log('The cursor should be placed at ' + index + '.');
+            _this2.cursorIndex = index;
+            _this2.update();
           });
-        }, 20);
-
-        this.updateCursorElement(cursorOptions);
-      }
-    );
-  }
-
-  /**
-   * Updates the Jax Element inside of `this.display`.
-   * 
-   * @param {String} jax
-   * @param {Function} callback
-   * 
-   * @return {Void}
-   */
-  updateJaxElement(jax, callback = Function) {
-    MathJax.Hub.Queue(
-      ['Text', this.jaxElement, jax],
-      callback
-    );
-  }
-
-  /**
-   * This updates the cursor position based on the amount
-   * of movement is given.
-   * 
-   * PS: The meaning of the variable `next` is not the next index,
-   *     but the next value the cursor will hold.
-   * 
-   * @param {Number} amount
-   * 
-   * @return {Void}
-   */
-  updateCursor(amount = 0) {
-    let next = this.cursor + amount;
-    const cursor = this.cursor;
-    const iterator = new __WEBPACK_IMPORTED_MODULE_2__Iterator__["a" /* default */](this.value);
-    const currentChar = iterator.at(cursor);
-    const nextChar = iterator.at(next);
-
-    // Moving to the left.
-
-    if (amount < 0) {
-      nextChar
-        .when('{')
-        .andPreviousCharacterNotIs('}')
-        .findBackwards('\\', '^', '_', ']')
-          .then(i => next = i);
-
-      nextChar
-        .when('{')
-        .andPreviousCharacterIs('}')
-          .then(() => next -= 1);
-
-      nextChar
-        .when('\\')
-        .andPreviousCharacterIs('\\')
-          .then(() => next -= 1);
-
-      nextChar
-        .when(' ')
-        .findBackwards('\\')
-          .then(i => next = i);
-
-      nextChar
-        .when('[')
-        .findBackwards('\\')
-          .then(i => next = i);
+          _this2.placer = placer;
+        }, 16);
+        _this2.updateCursorElement(cursorOptions);
+      });
     }
 
-    // Moving to the right.
+    /**
+     * Updates the Jax Element inside of `this.display`.
+     * 
+     * @param {String} jax
+     * @param {Function} callback
+     * 
+     * @return {Void}
+     */
 
-    if (amount > 0) {
-      currentChar
-        .when('\\', '^', '_')
-        .andNextCharacterNotIs('\\')
-        .findForwards('{', ' ', '[')
-          .then(i => next = i + 1);
+  }, {
+    key: 'updateJaxElement',
+    value: function updateJaxElement(jax) {
+      var _this3 = this;
 
-      currentChar
-        .when('}', ']')
-        .andNextCharacterIs('{')
-          .then(() => next += 1);
+      var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Function;
 
-      currentChar
-        .when('\\')
-        .andNextCharacterIs('\\')
-          .then(() => next += 1);
+      MathJax.Hub.Queue(function () {
+        return _this3.jaxElement.Text(jax);
+      }, callback);
     }
 
-    this.cursor = next;
-    this.update();
-  }
+    /**
+     * This updates the cursor position based on the amount
+     * of movement is given.
+     * 
+     * @param {Number} amount
+     * 
+     * @return {Void}
+     */
 
-  /**
-   * Update the cursor element.
-   * 
-   * @param {Object} options
-   * @param {Boolean} options.hidden
-   * 
-   * @return {Void}
-   */
-  updateCursorElement(options = {}) {
-    const hidden = options.hidden || false;
+  }, {
+    key: 'updateCursor',
+    value: function updateCursor() {
+      var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
-    
-    MathJax.Hub.Queue(() => {
-      const $cursor = this.$display.querySelector('.mjx-cursor');
-      if (!$cursor) {
-        return;
+      var cursorIndex = this.cursorIndex;
+      var points = this.tex.cursorPoints;
+      var key = points.indexOf(cursorIndex);
+
+      var to = cursorIndex;
+
+      if (amount > 0) {
+        to = points[key + 1];
+      } else if (amount < 0) {
+        to = points[key - 1];
       }
-      if (!$cursor.style.marginLeft) {
-        $cursor.style.marginLeft = `-${$cursor.offsetWidth}px`;
-      }
 
-      // Fix #7
-      if (this._cursorRecentlyPlaced) {
-        clearTimeout(this._cursorRecentlyPlaced);
-      }
-      __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__utils__["c" /* addClass */])($cursor, 'wasRecentlyPlaced');
-      this._cursorRecentlyPlaced = setTimeout(() => {
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__utils__["d" /* removeClass */])($cursor, 'wasRecentlyPlaced');
-      }, 600);
-
-      $cursor.style.display = hidden ? 'none' : 'inline-block';
-    });
-  }
-
-  /**
-   * Find a jax command at given position.
-   * 
-   * For instance, consider this as the current value of the editor:
-   * 
-   *     '\sqrt{2}'
-   * 
-   * If the given position is the index of any character of the
-   * command '\sqrt', it will return the start and the end of the
-   * command.
-   * 
-   * @param {Number} position
-   * 
-   * @return {Object}
-   */
-  findCommandAt(position) {
-    const coordinates = { start: null, end: null };
-    const value = this.value;
-    const length = value.length;
-    const previous = position - 1;
-    const next = position + 1;
-    let i;
-    
-    i = next;
-
-    while (i--) {
-      if (~['\\', '^', '_'].indexOf(value[i])) {
-        coordinates.start = i;
-        break;
-      }
+      this.cursorIndex = to;
+      this.update();
     }
 
-    i = previous;
+    /**
+     * Update the cursor element.
+     * 
+     * @param {Object} options
+     * @param {Boolean} options.hidden
+     * 
+     * @return {Void}
+     */
 
-    while (i++ < value.length) {
-      if (value[i] === '}' && value[i + 1] !== '{') {
-        coordinates.end = i;
-        break;
+  }, {
+    key: 'updateCursorElement',
+    value: function updateCursorElement() {
+      var _this4 = this;
+
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var $display = this.$display;
+
+      var hidden = options.cursorHidden || false;
+      var className = 'wasRecentlyPlaced';
+
+      MathJax.Hub.Queue(function () {
+        var $cursor = $display.querySelector('.mjx-cursor');
+
+        if (!$cursor) {
+          return;
+        }
+
+        var offsetWidth = $cursor.offsetWidth,
+            offsetLeft = $cursor.offsetLeft;
+
+
+        if (!$cursor.style.marginLeft) {
+          $cursor.style.marginLeft = '-' + offsetWidth + 'px';
+        }
+
+        if (_this4.lastCursorTimeout) {
+          clearTimeout(_this4.lastCursorTimeout);
+        }
+
+        (0, _utils.addClass)($cursor, className);
+
+        _this4.lastCursorTimeout = setTimeout(function () {
+          return (0, _utils.removeClass)($cursor, className);
+        }, 600);
+
+        $display.scrollLeft = offsetLeft;
+
+        $cursor.style.display = hidden ? 'none' : 'inline-block';
+      });
+    }
+  }, {
+    key: 'setValue',
+    value: function setValue(value) {
+      this.lastValue = this.value;
+      this.value = value;
+    }
+
+    /**
+     * This will handle the events of `this.$input`.
+     * It captures the key pressed and what the user have typed.
+     * 
+     * @param {KeyboardEvent} e
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'handleInputEvent',
+    value: function handleInputEvent(e) {
+      var _this5 = this;
+
+      var $input = this.$input;
+
+      var inputValue = $input.value.trim();
+      var which = e.keyCode;
+
+      $input.value = '';
+
+      if (e.type === 'keyup') {
+        which = null;
       }
 
-      if (value[i - 1] === ' ') {
-        coordinates.end = i - 1;
-        break;
+      if (!inputValue.length) {
+        return this.handleInput(which);
       }
-    }
 
-    if (coordinates.end === null) {
-      coordinates.end = i;
-    }
+      var translate = {
+        '+': '+',
+        '-': '-',
+        '=': '=',
+        ',': ',',
+        '.': '.',
+        '*': '\\cdot ',
+        '/': '\\div '
+      };
 
-    return coordinates;
-  }
+      var test = {
+        char: /[\d\w]/
+      };
 
-  /**
-   * This will handle the events of `this.$input`.
-   * It captures the key pressed and what the user have typed.
-   * 
-   * @param {KeyboardEvent} e
-   * 
-   * @return {Void}
-   */
-  handleInputEvent(e) {
-    const $input = this.$input;
-    const inputValue = $input.value.trim();
-    let which = e.keyCode;
-
-    $input.value = '';
-
-    if (e.type === 'keyup') {
-      which = null;
-    }
-
-    if (!inputValue.length) {
-      return this.handleInput(which);
-    }
-
-    const translate = {
-      '+': '+',
-      '-': '-',
-      '=': '=',
-      ',': ',',
-      '.': '.',
-      '*': '\\cdot ',
-      '/': '\\div '
-    };
-
-    const test = {
-      char: /[\d\w]/
-    };
-
-    inputValue.split('')
-      .forEach(char => {
+      inputValue.split('').forEach(function (char) {
         if (!char.match(test.char) && !translate[char]) {
           return;
         }
@@ -562,104 +1018,438 @@ class Editor {
           char = translate[char];
         }
 
-        this.handleInput(which, char);
+        _this5.handleInput(which, char);
       });
-  }
+    }
 
-  /**
-   * Handles the user input.
-   * 
-   * @param {Number} which - Which key was pressed.
-   * @param {String} char - The character that was typed.
-   * 
-   * @return {Void}
-   */
-  handleInput(which, char) {
-    switch (which) {
-      case KEY_LEFT:
-        this.moveCursorLeft();
+    /**
+     * Handles the user input.
+     * 
+     * @param {Number} which - Which key was pressed.
+     * @param {String} char - The character that was typed.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'handleInput',
+    value: function handleInput(which, char) {
+      switch (which) {
+        case KEY_LEFT:
+          this.moveCursorLeft();
+          return;
+
+        case KEY_RIGHT:
+          this.moveCursorRight();
+          return;
+
+        case KEY_BACKSPACE:
+          this.erase();
+          return;
+
+        case KEY_DELETE:
+          this.delete();
+          return;
+
+        case KEY_ENTER:
+          if (this.newLine) {
+            this.insert('\\\\');
+          }
+          return;
+      }
+
+      if (which && this.debug) {
+        console.warn('The key ' + which + ' was pressed.');
+      }
+
+      if (!char) {
         return;
+      }
 
-      case KEY_RIGHT:
-        this.moveCursorRight();
+      this.insert(char);
+    }
+
+    /**
+     * Move the cursor to the left.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'moveCursorLeft',
+    value: function moveCursorLeft() {
+      if (this.cursorIndex > 0) {
+        this.updateCursor(-1);
+      }
+    }
+
+    /**
+     * Move the cursor to the right.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'moveCursorRight',
+    value: function moveCursorRight() {
+      if (this.cursorIndex < this.value.length) {
+        this.updateCursor(1);
+      }
+    }
+
+    /**
+     * When document.body is clicked, this will check if the
+     * cursor can be moved.
+     * 
+     * @see Placer
+     * 
+     * @param {Event} e
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'handleBodyClick',
+    value: function handleBodyClick(e) {
+      if (!this.placer) {
         return;
+      }
 
-      case KEY_BACKSPACE:
-        this.erase();
+      this.placer.trigger('click', e);
+    }
+
+    /**
+     * Focus the editor.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'focus',
+    value: function focus() {
+      this.$input.focus();
+      this.updateCursorElement({ cursorHidden: false });
+      this.bus.trigger('focus');
+      (0, _utils.addClass)(this.$display, this.focusClass);
+    }
+
+    /**
+     * Blur the editor.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'blur',
+    value: function blur() {
+      this.$input.blur();
+      this.updateCursorElement({ cursorHidden: true });
+      this.bus.trigger('blur');
+      (0, _utils.removeClass)(this.$display, this.focusClass);
+    }
+
+    /**
+     * Insert a piece of text in editor's value.
+     * 
+     * @param {String} chars
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'insert',
+    value: function insert(chars) {
+      var cursorIndex = this.cursorIndex,
+          value = this.value;
+
+
+      this.cursorIndex += chars.length;
+
+      this.setValue((0, _utils.insertBetween)(value, cursorIndex, chars));
+      this.update();
+    }
+
+    /**
+     * Inserts a command in the editor.
+     * 
+     * The cursor will moved to the first "block" ({}).
+     * 
+     * @param {String} command - The command.
+     * @param {Number} blockCount - The quantity of blocks it requires.
+     * @param {Boolean} brackets - If brackets should be placed.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'insertCommand',
+    value: function insertCommand(command) {
+      var blockCount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+      var brackets = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+      var dontNeedBackslash = ['^', '_'];
+
+      this.focus();
+
+      if (command[0] !== '\\' && !(0, _utils.isAny)(command, dontNeedBackslash)) {
+        command = '\\' + command;
+      }
+
+      if (brackets) {
+        command += '[]';
+      }
+
+      if (blockCount > 0) {
+        command += '{';
+      } else {
+        command += ' ';
+      }
+
+      this.insert(command);
+
+      if (blockCount < 1) {
         return;
+      }
 
-      case KEY_DELETE:
-        this.delete();
-        return;
+      var value = this.value,
+          cursorIndex = this.cursorIndex;
 
-      case KEY_ENTER:
-        if (this.newLine) {
-          this.insert('\\\\');
+      var blocks = '}' + (0, _utils.repeat)('{}', blockCount - 1);
+
+      this.setValue((0, _utils.insertBetween)(value, cursorIndex, blocks));
+      this.update();
+    }
+
+    /**
+     * Apply a deletion method based on cursor position.
+     * 
+     * @param {String} method - Available: "erase" and "delete".
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'applyDeletion',
+    value: function applyDeletion(method) {
+      var cursorIndex = this.cursorIndex,
+          tex = this.tex;
+
+      var prevIndex = cursorIndex - 1;
+      var elements = tex.elements;
+
+      var deletionStart = null;
+      var deletionEnd = null;
+      var comparator = void 0;
+      var startOrEnd = void 0;
+      var openOrClose = void 0;
+      var numVarDeletionStart = void 0;
+      var numVarDeletionEnd = void 0;
+
+      switch (method) {
+        case 'erase':
+          if (cursorIndex === 0) {
+            return;
+          }
+          comparator = prevIndex;
+          startOrEnd = 'end';
+          openOrClose = 'openIndex';
+          numVarDeletionStart = prevIndex;
+          numVarDeletionEnd = cursorIndex;
+          break;
+
+        case 'delete':
+          if (cursorIndex === tex.length) {
+            return;
+          }
+          comparator = cursorIndex;
+          startOrEnd = 'start';
+          openOrClose = 'closeIndex';
+          numVarDeletionStart = cursorIndex;
+          numVarDeletionEnd = cursorIndex + 1;
+          break;
+
+        default:
+          throw new RangeError('Unknown method "' + method + '".');
+      }
+
+      // Deal with new lines deletion.
+      if (tex.newLines[comparator]) {
+        var nl = tex.newLines[comparator];
+        deletionStart = nl.start;
+        deletionEnd = nl.end + 1;
+      } else {
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = elements[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var element = _step.value;
+            var index = element.index,
+                props = element.props;
+
+            // Command deletion.
+
+            if (props) {
+              var brackets = props.brackets;
+
+              // If is erasing at the start/end of the command/ or is erasing brackets of the command.
+              if (props[startOrEnd] === comparator || brackets && brackets[openOrClose] === comparator) {
+                deletionStart = props.start;
+                deletionEnd = props.end + 1;
+                break;
+              }
+              // If is erasing one of block opening/closing.
+              var _iteratorNormalCompletion2 = true;
+              var _didIteratorError2 = false;
+              var _iteratorError2 = undefined;
+
+              try {
+                for (var _iterator2 = props.blocks[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                  var block = _step2.value;
+
+                  if (block[openOrClose] === comparator) {
+                    deletionStart = props.start;
+                    deletionEnd = props.end + 1;
+                    break;
+                  }
+                }
+              } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+              } finally {
+                try {
+                  if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                    _iterator2.return();
+                  }
+                } finally {
+                  if (_didIteratorError2) {
+                    throw _iteratorError2;
+                  }
+                }
+              }
+            }
+            // Number/variable deletion.
+            else if (index === comparator) {
+                deletionStart = numVarDeletionStart;
+                deletionEnd = numVarDeletionEnd;
+                break;
+              }
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
         }
-        return;
+      }
+
+      this.cursorIndex = deletionStart;
+      this.setValue((0, _utils.removeFragment)(this.value, deletionStart, deletionEnd));
+      this.update();
     }
 
-    if (which && this.debug) {
-      console.warn(`The key ${which} was pressed.`);
+    /**
+     * Erases the character before the cursor.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'erase',
+    value: function erase() {
+      this.applyDeletion('erase');
     }
 
-    if (!char) {
-      return;
+    /**
+     * Erases the character before the cursor.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'delete',
+    value: function _delete() {
+      this.applyDeletion('delete');
     }
 
-    this.insert(char);
-  }
+    /**
+     * Listen to an event to be triggered by Editor.
+     * 
+     * @param {String} type
+     * @param {Function} listener
+     * 
+     * @return {Void}
+     */
 
+  }, {
+    key: 'on',
+    value: function on(type, listener) {
+      this.bus.on(type, listener);
+    }
+  }]);
+
+  return Editor;
+}();
+
+exports.default = Editor;
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Editor = __webpack_require__(4);
+
+var _Editor2 = _interopRequireDefault(_Editor);
+
+var _extendMathJax = __webpack_require__(8);
+
+var _extendMathJax2 = _interopRequireDefault(_extendMathJax);
+
+var _utils = __webpack_require__(0);
+
+var _constants = __webpack_require__(2);
+
+var _constants2 = _interopRequireDefault(_constants);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+window.addEventListener('load', _extendMathJax2.default);
+
+/**
+ * This is the MathJaxEditor class.
+ * 
+ * It has an API on top of the Editor class.
+ */
+
+var MathJaxEditor = function () {
   /**
-   * Move the cursor to the left.
+   * Creates an instance of Editor.
    * 
-   * @return {Void}
+   * @constructor
    */
-  moveCursorLeft() {
-    if (this.cursor > 0) {
-      this.updateCursor(-1);
-    }
-  }
+  function MathJaxEditor(options) {
+    _classCallCheck(this, MathJaxEditor);
 
-  /**
-   * Move the cursor to the right.
-   * 
-   * @return {Void}
-   */
-  moveCursorRight() {
-    if (this.cursor < this.value.length) {
-      this.updateCursor(1);
-    }
-  }
-  
-  /**
-   * When document.body is clicked, this will check if the
-   * cursor can be moved.
-   * 
-   * @see Placer
-   * 
-   * @param {Event} e
-   * 
-   * @return {Void}
-   */
-  handleBodyClick(e) {
-    if (!this.placer) {
-      return;
-    }
-    
-    this.placer.fireClick(e);
-  }
+    var core = new _Editor2.default(options);
 
-  /**
-   * Focus the editor.
-   * 
-   * @return {Void}
-   */
-  focus() {
-    this.$input.focus();
-    this.updateCursorElement({ hidden: false });
-    this.bus.trigger('focus');
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__utils__["c" /* addClass */])(this.$display, this.focusClass);
+    this.core = core;
+    this.version = '1.2.7';
   }
 
   /**
@@ -667,824 +1457,1202 @@ class Editor {
    * 
    * @return {Void}
    */
-  blur() {
-    this.$input.blur();
-    this.updateCursorElement({ hidden: true });
-    this.bus.trigger('blur');
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__utils__["d" /* removeClass */])(this.$display, this.focusClass);
-  }
 
-  /**
-   * Insert a piece of text in editor's value.
-   * 
-   * @param {String} value
-   * 
-   * @return {Void}
-   */
-  insert(value) {
-    const cursor = this.cursor;
-    const current = this.value;
 
-    this.cursor += value.length;
-    this.value = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__utils__["b" /* insertBetween */])(current, cursor, value);
-
-    this.update();
-  }
-
-  /**
-   * Inserts a command in the editor.
-   * 
-   * The cursor will moved to the first "block" ({}).
-   * 
-   * @param {String} command - The command.
-   * @param {Number} blockCount - The quantity of blocks it requires.
-   * @param {Boolean} brackets - If brackets should be placed.
-   * 
-   * @return {Void}
-   */
-  insertCommand(command, blockCount = 1, brackets = false) {
-    this.focus();
-
-    if (brackets) {
-      command += '[]';
+  _createClass(MathJaxEditor, [{
+    key: 'blur',
+    value: function blur() {
+      this.core.blur();
     }
 
-    if (blockCount > 0) {
-      command += '{';
+    /**
+     * Focus the editor.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'focus',
+    value: function focus() {
+      this.core.focus();
     }
-    else {
-      command += ' ';
+
+    /**
+     * This inserts a command into the editor.
+     * 
+     * @param {String} command
+     * @param {Number} blockCount
+     * @param {Boolean} brackets
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'insertCommand',
+    value: function insertCommand(command) {
+      var blockCount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+      var brackets = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+      this.core.insertCommand(command, blockCount, brackets);
     }
 
-    this.insert(command);
+    /**
+     * Insert a character at cursor position.
+     * Allowed characters: 0-9 (numbers), a-z (variables).
+     * 
+     * @param {String} insert
+     * 
+     * @return {Void}
+     */
 
-    if (blockCount < 1) {
-      return;
+  }, {
+    key: 'insert',
+    value: function insert(char) {
+      var number = _constants2.default.number,
+          variable = _constants2.default.variable;
+
+      if (char.length !== 1) {
+        throw new RangeError('Only one char can be inserted through this method.');
+      }
+      if (!char.match(number) && !char.match(variable)) {
+        throw new RangeError('Only numbers and variables are allowed in insert, not "' + char + '".');
+      }
+      this.core.insert(char);
     }
 
-    const value = this.value;
-    const cursor = this.cursor;
-    const blocks = '}' + '{}'.repeat(blockCount - 1);
+    /**
+     * Insert a symbol at cursor position.
+     * 
+     * @param {String} symbol
+     */
 
-    this.value = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__utils__["b" /* insertBetween */])(value, cursor, blocks);
-    this.update();
-  }
+  }, {
+    key: 'insertSymbol',
+    value: function insertSymbol(symbol) {
+      var operators = _constants2.default.operators,
+          escapedOperators = _constants2.default.escapedOperators;
 
-  /**
-   * Erases the character before the cursor.
-   * 
-   * @return {Void}
-   */
-  erase() {
-    const current = this.cursor;
-    const previous = this.cursor - 1;
-    const value = this.value;
+      var symbols = operators.slice().concat(escapedOperators);
 
-    let before;
-    let after;
-
-    // Check if we are erasing a command.
-    if (~['{', '}', ' '].indexOf(value[previous])) {
-      const coordinates = this.findCommandAt(current);
-      before = value.slice(0, coordinates.start);
-      after = value.slice(coordinates.end + 1);
-    }
-    else {
-      let beforeIndex = current - 1;
-
-      // Check if we are erasing a new line.
-      if (value[previous] === '\\' 
-            && value[previous - 1] === '\\') {
-        beforeIndex -= 1;
+      if (!(0, _utils.inArray)(symbol, symbols)) {
+        throw new RangeError('"' + symbol + '" is not a valid symbol.');
       }
 
-      before = value.slice(0, beforeIndex);
-      after = value.slice(current);
-    }
-
-    this.value = before + after;
-    this.cursor = before.length;
-
-    this.update();
-  }
-
-  /**
-   * Erases the character before the cursor.
-   * 
-   * @return {Void}
-   */
-  delete() {
-    const current = this.cursor;
-    const next = this.cursor + 1;
-    const value = this.value;
-
-    let before;
-    let after;
-
-    // Check if we are erasing a command (and not a new line).
-    if ((value[current] === '\\' && value[next] !== '\\') 
-          || value[current] === '}') {
-      const coordinates = this.findCommandAt(current);
-      before = value.slice(0, coordinates.start);
-      after = value.slice(coordinates.end + 1);
-    }
-    else {
-      let beforeIndex = current;
-      let afterIndex = next;
-
-      // Check if we are erasing a new line.
-      if (value[current] === '\\' 
-            && value[next] === '\\') {
-        afterIndex += 1;
+      if ((0, _utils.inArray)(symbol, escapedOperators)) {
+        symbol = '\\' + symbol;
       }
 
-      before = value.slice(0, beforeIndex);
-      after = value.slice(afterIndex);
+      this.core.insert(symbol);
     }
 
-    this.value = before + after;
-    this.cursor = before.length;
+    /**
+     * Get editor's value.
+     *  
+     * @return {String}
+     */
 
-    this.update();
+  }, {
+    key: 'getValue',
+    value: function getValue() {
+      return this.core.value;
+    }
+
+    /**
+     * Move the cursor to the left.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'moveCursorLeft',
+    value: function moveCursorLeft() {
+      this.core.moveCursorLeft();
+    }
+
+    /**
+     * Move the cursor to the right.
+     * 
+     * @return {Void} 
+     */
+
+  }, {
+    key: 'moveCursorRight',
+    value: function moveCursorRight() {
+      this.core.moveCursorRight();
+    }
+
+    /**
+     * Erases the character before the cursor.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'erase',
+    value: function erase() {
+      this.core.erase();
+    }
+
+    /**
+     * Listen to an event to be triggered by the Editor.
+     * 
+     * @param {String} type
+     * @param {Function} listener
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'on',
+    value: function on(type, listener) {
+      this.core.on(type, listener);
+    }
+  }]);
+
+  return MathJaxEditor;
+}();
+
+module.exports = MathJaxEditor;
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _EventBus = __webpack_require__(1);
+
+var _EventBus2 = _interopRequireDefault(_EventBus);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var $paints = [];
+
+var Placer = function () {
+  /**
+   * This will handle the cursor placement when the user clicks somewhere
+   * on the editor.
+   * 
+   * @param {Editor} editor
+   * 
+   * @constructor
+   */
+  function Placer(editor) {
+    _classCallCheck(this, Placer);
+
+    var bus = new _EventBus2.default();
+
+    bus.on('click', this.handleClick.bind(this));
+
+    this.$display = editor.$display;
+    this.bus = bus;
+    this.intervals = [];
+    this.elements = editor.tex.elements;
+    this.findings = {};
+    this.tex = editor.tex;
+
+    this.iterate();
   }
 
   /**
-   * Listen to an event to be triggered by the Editor.
+   * Listen to an event to be triggered by Placer.
    * 
    * @param {String} type
    * @param {Function} listener
    * 
    * @return {Void}
    */
-  on(type, listener) {
-    this.bus.on(type, listener);
-  }
-}
 
-/* harmony default export */ exports["a"] = Editor;
 
-/***/ },
-/* 2 */
-/***/ function(module, exports, __webpack_require__) {
-
-"use strict";
-class EventBus {
-  constructor() {
-    this.registry = {};
-  }
-
-  on(type, listener) {
-    this.registry[type] = (this.registry[type] || []).concat(listener);
-  }
-
-  trigger(type, ...rest) {
-    if (this.registry[type]) {
-      this.registry[type].forEach(listener => listener(...rest));
+  _createClass(Placer, [{
+    key: 'on',
+    value: function on(type, listener) {
+      this.bus.on(type, listener);
     }
-  }
-}
 
-/* harmony default export */ exports["a"] = EventBus;
+    /**
+     * Triggers an event inside Placer.
+     * 
+     * @param {String} type
+     * @param {Mixed} ...rest
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'trigger',
+    value: function trigger(type) {
+      var _bus;
+
+      for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        rest[_key - 1] = arguments[_key];
+      }
+
+      (_bus = this.bus).trigger.apply(_bus, [type].concat(rest));
+    }
+
+    /**
+     * Checks if the cursor must be moved, and if so,
+     * it triggers the event 'setCursor' with the position.
+     * 
+     * @param {Event} e
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'handleClick',
+    value: function handleClick(e) {
+      var _this = this;
+
+      var _$display$getBounding = this.$display.getBoundingClientRect(),
+          top = _$display$getBounding.top,
+          bottom = _$display$getBounding.bottom;
+
+      var x = e.clientX;
+      var y = e.clientY;
+      var intervals = this.intervals;
+      var index = this.tex.length;
+
+      if (!intervals.length || y > bottom || y < top) {
+        return false;
+      }
+
+      var found = false;
+      var proceedSearch = true;
+
+      // First strategy: checks if the clicked point is inside a number/
+      // variable/operator bounding. If it is, place it where is proper.
+
+      intervals.forEach(function (interval, i) {
+        if (interval.startX <= x && x < interval.endX && proceedSearch) {
+          if (interval.startY <= y && y < interval.endY) {
+            found = true;
+            index = _this.placeAtInterval(interval, i, x, y);
+            if (interval.box) {
+              proceedSearch = false;
+            }
+          }
+        }
+      });
+
+      // Second strategy: find the nearest element to the clicked point.
+
+      if (!found) {
+        var _ret = function () {
+          var last = { interval: null, distance: null, i: null };
+
+          intervals.forEach(function (interval, i) {
+            if (!(interval.startY < y && y < interval.endY)) {
+              return;
+            }
+            var distance = Math.min(Math.abs(interval.startX - x), Math.abs(interval.endX - x));
+            if (last.distance === null || distance < last.distance) {
+              last.interval = interval;
+              last.distance = distance;
+              last.i = i;
+            }
+          });
+
+          if (!last.interval) {
+            return {
+              v: false
+            };
+          }
+
+          index = _this.placeAtInterval(last.interval, last.i, x, y);
+        }();
+
+        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+      }
+
+      this.bus.trigger('setCursor', index);
+    }
+
+    /**
+     * Get the next key for a type.
+     * 
+     * @param {String} type
+     * 
+     * @return {Number}
+     */
+
+  }, {
+    key: 'getNextKeyFor',
+    value: function getNextKeyFor(type) {
+      this.findings[type] = this.findings[type] || 0;
+      var key = this.findings[type];
+      this.findings[type] += 1;
+      return key;
+    }
+
+    /**
+     * Add an interval at the given index in intervals list.
+     *
+     * @param {Number} key
+     * @param {Object} data
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'addIntervalAt',
+    value: function addIntervalAt(key, data) {
+      this.intervals.splice(key, 0, data);
+    }
+
+    /**
+     * Add an interval to intervals list.
+     * 
+     * @param {Object} data
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'addInterval',
+    value: function addInterval(data) {
+      if (Number.isNaN(data.index)) {
+        console.log(this.elements);
+        console.error('This interval has NaN as index.');
+      }
+      this.intervals.push(data);
+    }
+
+    /**
+     * Shortcut for adding an interval.
+     * 
+     * @param {Number} index
+     * @param {Object} bounding
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'addIntervalBox',
+    value: function addIntervalBox(index, _ref) {
+      var top = _ref.top,
+          bottom = _ref.bottom,
+          left = _ref.left,
+          right = _ref.right;
+
+      this.addInterval({
+        index: index,
+        startX: left,
+        endX: right,
+        startY: top,
+        endY: bottom,
+        box: true
+      });
+    }
+
+    /**
+     * Add an interval without bouncing.
+     * 
+     * @param {Number} index
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'addBouncinglessInterval',
+    value: function addBouncinglessInterval(index) {
+      this.addInterval({
+        index: index,
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0
+      });
+    }
+
+    /**
+     * Returns the index which the cursor should be placed
+     * based on given `x`, and `y`.
+     * 
+     * @param {Object} interval
+     * @param {Number} x
+     * @param {Number} y
+     * @param {Number} i - Index of the given interval inside `this.intervals`.
+     * 
+     * @return {Number}
+     */
+
+  }, {
+    key: 'placeAtInterval',
+    value: function placeAtInterval(interval, i, x, y) {
+      var intervals = this.intervals;
+      var width = interval.endX - interval.startX;
+      var nextInterval = i + 1;
+
+      var index = interval.index;
+
+      if (interval.box) {
+        return index;
+      }
+
+      if (x > interval.startX + width / 2) {
+        if (intervals[nextInterval]) {
+          index = intervals[nextInterval].index;
+        } else {
+          index = this.tex.length;
+        }
+      }
+
+      return index;
+    }
+
+    /**
+     * Iterates over the elements created by Tex to find
+     * the elements in the DOM and compute them.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'iterate',
+    value: function iterate() {
+      var _this2 = this;
+
+      this.elements.forEach(function (element) {
+        switch (element.is) {
+          case 'command':
+            _this2.findCommand(element);
+            break;
+
+          case 'eol':
+            _this2.findEndOfLine(element);
+            break;
+
+          default:
+            _this2.find(element);
+        }
+      });
+    }
+
+    /**
+     * Find an element of the given type and add its interval data 
+     * to `this.intervals`.
+     * 
+     * @param {Object} data
+     * @param {String} data.type
+     * @param {Number} data.index
+     * @param {Boolean} data.nearClosure
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'find',
+    value: function find(data) {
+      var type = data.type,
+          index = data.index,
+          nearClosure = data.nearClosure;
+
+      var key = this.getNextKeyFor(type);
+      var $el = this.$display.querySelectorAll('.mjx-' + type)[key];
+      if (!$el) {
+        return console.warn('Could not find an element of type ' + type + '.', index);
+      }
+
+      var _$el$getBoundingClien = $el.getBoundingClientRect(),
+          left = _$el$getBoundingClien.left,
+          right = _$el$getBoundingClien.right,
+          top = _$el$getBoundingClien.top,
+          bottom = _$el$getBoundingClien.bottom;
+
+      this.addInterval({
+        startX: left,
+        endX: right,
+        startY: top,
+        endY: bottom,
+        index: index
+      });
+
+      if (nearClosure) {
+        this.addBouncinglessInterval(index + 1);
+      }
+    }
+
+    /**
+     * Find a command element.
+     * 
+     * @param {Object} data
+     * @param {String} data.type
+     * @param {Number} data.index
+     * @param {Object} data.props
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'findCommand',
+    value: function findCommand(_ref2) {
+      var _this3 = this;
+
+      var type = _ref2.type,
+          index = _ref2.index,
+          props = _ref2.props;
+
+      var key = this.getNextKeyFor(type);
+      var $el = this.$display.querySelectorAll('.mjx-m' + type)[key];
+      var brackets = props.brackets,
+          blocks = props.blocks,
+          subType = props.subType;
+
+
+      this.addBouncinglessInterval(props.start);
+
+      switch (type) {
+        case 'frac':
+          var $numerator = $el.querySelector('.mjx-numerator');
+          var $denominator = $el.querySelector('.mjx-denominator');
+          var numBounding = $numerator.getBoundingClientRect();
+          var denBounding = $denominator.getBoundingClientRect();
+          var boundings = [numBounding, denBounding];
+
+          boundings.forEach(function (bounding, i) {
+            if (blocks[i].length === 1) {
+              _this3.addIntervalBox(blocks[i].closeIndex, bounding);
+            }
+          });
+
+          break;
+
+        case 'root':
+        case 'sqrt':
+          if (brackets && brackets.closeIndex - brackets.openIndex === 1) {
+            var $root = $el.querySelector('.mjx-root .mjx-char');
+            var bounding = $root.getBoundingClientRect();
+            this.addIntervalBox(brackets.closeIndex, bounding);
+          }
+          if (blocks[0].length === 1) {
+            var $box = $el.querySelector('.mjx-box');
+            var _bounding = $box.getBoundingClientRect();
+            this.addIntervalBox(blocks[0].closeIndex, _bounding);
+          }
+          break;
+
+        case 'subsup':
+          if (blocks[0].length === 1) {
+            var $target = $el.querySelector('.mjx-' + subType);
+            var _bounding2 = $target.getBoundingClientRect();
+            this.addIntervalBox(blocks[0].closeIndex, _bounding2);
+          }
+          break;
+      }
+    }
+
+    /**
+     * Find an end of line element.
+     * 
+     * @param {Object} data
+     * @param {String} data.type
+     * @param {Number} data.index
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'findEndOfLine',
+    value: function findEndOfLine(_ref3) {
+      var type = _ref3.type,
+          index = _ref3.index;
+
+      var key = this.getNextKeyFor(type);
+      var $el = this.$display.querySelectorAll('.mjx-' + type)[key];
+      // If $el was not found, it seems there is only one line.
+      if (!$el) {
+        $el = this.$display.querySelector('.mjx-math');
+      }
+      var $box = $el.firstChild;
+
+      var _$box$getBoundingClie = $box.getBoundingClientRect(),
+          top = _$box$getBoundingClie.top,
+          left = _$box$getBoundingClie.left,
+          bottom = _$box$getBoundingClie.bottom,
+          right = _$box$getBoundingClie.right;
+
+      var width = 20;
+      var lineStart = this.findLastStartOfLineIndex();
+
+      // Insert start of line interval.
+      this.addIntervalAt(lineStart.intervalKey, {
+        index: lineStart.start,
+        startX: left - width,
+        endX: left,
+        startY: top,
+        endY: bottom,
+        box: true
+      });
+
+      // Insert end of line interval.
+      this.addInterval({
+        index: index,
+        startX: right,
+        endX: right + width,
+        startY: top,
+        endY: bottom,
+        box: true
+      });
+    }
+
+    /**
+     * Find the last start of line index in the intervals list.
+     * 
+     * @return {Number}
+     */
+
+  }, {
+    key: 'findLastStartOfLineIndex',
+    value: function findLastStartOfLineIndex() {
+      var intervals = this.intervals.slice().reverse();
+      var length = intervals.length;
+      var i = 0;
+      var start = 0;
+      var intervalKey = 0;
+
+      for (; i < length; i++) {
+        var interval = intervals[i];
+        if (interval.is === 'eol') {
+          start = interval.index + 2;
+          intervalKey = key;
+          break;
+        }
+      }
+
+      return { start: start, intervalKey: intervalKey };
+    }
+
+    // Debug function to draw a interval.
+
+  }, {
+    key: 'paint',
+    value: function paint(interval) {
+      var $div = document.createElement('div');
+      $div.style.position = 'absolute';
+      $div.style.backgroundColor = 'rgba(0, 0, 255, 0.5)';
+      $div.style.width = interval.endX - interval.startX + 'px';
+      $div.style.height = interval.endY - interval.startY + 'px';
+      $div.style.top = interval.startY + 'px';
+      $div.style.left = interval.startX + 'px';
+      $div.style.pointerEvents = 'none';
+      document.body.appendChild($div);
+      return $div;
+    }
+
+    // Debug function to paint all intervals.
+
+  }, {
+    key: 'paintIntervals',
+    value: function paintIntervals() {
+      var _this4 = this;
+
+      $paints.forEach(function ($paint) {
+        return document.body.removeChild($paint);
+      });
+      $paints = [];
+
+      this.intervals.forEach(function (interval) {
+        $paints.push(_this4.paint(interval));
+      });
+
+      console.log(this.intervals);
+    }
+  }]);
+
+  return Placer;
+}();
+
+exports.default = Placer;
 
 /***/ },
-/* 3 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
-/**
- * This class helps to iterate over a string.
- */
-class Iterator {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _utils = __webpack_require__(0);
+
+var _constants = __webpack_require__(2);
+
+var _constants2 = _interopRequireDefault(_constants);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var nearClosureHaystack = _constants2.default.nearClosureHaystack,
+    cursorTex = _constants2.default.cursorTex,
+    emptyTex = _constants2.default.emptyTex,
+    escType = _constants2.default.escType;
+
+
+var test = {
+  isNumber: _constants2.default.number,
+  isVariable: _constants2.default.variable,
+  isOperator: (0, _utils.listToCharacterRegex)(_constants2.default.operators),
+  isEscapedOperator: (0, _utils.listToCharacterRegex)(_constants2.default.escapedOperators)
+};
+
+var Tex = function () {
   /**
+   * This class will parse the given tex and produce `cursorPoints` (indexes)
+   * where cursor can be placed, and `elements` (that are passed to Placer).
+   * 
    * @param {String} tex
+   * @param {Number} cursorIndex
+   * 
    * @constructor
    */
-  constructor(tex) {
+  function Tex(tex) {
+    var cursorIndex = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+    _classCallCheck(this, Tex);
+
     this.tex = tex;
-  }
-
-  /**
-   * Get character at given index.
-   * 
-   * @param {Number} index
-   * 
-   * @return IteratorCharacter
-   */
-  at(index) {
-    return new IteratorCharacter(this.tex, index);
-  }
-}
-
-/**
- * This class represents a text character.
- */
-class IteratorCharacter {
-  /**
-   * @param {String} tex - Text it came from.
-   * @param {Number} index - Its index in that text.
-   *
-   * @constructor
-   */
-  constructor(tex, index) {
-    this.tex = tex;
-    this.index = index;
-    this.value = tex[index];
-  }
-
-  /**
-   * Check if this character is equals to any of given arguments.
-   * 
-   * @param {String} ...chars
-   * 
-   * @return {Boolean}
-   */
-  is(...chars) {
-    return !!~chars.indexOf(this.value);
-  }
-
-  /**
-   * If the char is equals to any of given arguments,
-   * returns a logic constructor.
-   * 
-   * @param {String} ...char
-   * 
-   * @return {IteratorFlow}
-   */
-  when(...chars) {
-    return new IteratorFlow(this, this.is(...chars));
-  }
-
-  /**
-   * Get the character previous to this character.
-   * 
-   * @return {IteratorCharacter}
-   */
-  previousCharacter() {
-    return new IteratorCharacter(this.tex, this.index - 1);
-  }
-
-  /**
-   * Get the character next to this character.
-   * 
-   * @return {IteratorCharacter}
-   */
-  nextCharacter() {
-    return new IteratorCharacter(this.tex, this.index + 1);
-  }
-}
-
-class IteratorFlow {
-  /**
-   * @param {IteratorCharacter} char
-   * @param {Boolean} assertion
-   * 
-   * @constructor
-   */
-  constructor(char, assertion) {
-    this.assertion = assertion;
-    this.char = char;
-    this.tex = char.tex;
-    this.iterator = char.index;
-  }
-
-  /**
-   * @param {Boolean} expression
-   */
-  and(expression) {
-    if (this.assertion) {
-      this.assertion = !!expression;
-    }
-  }
-
-  /**
-   * Check if next character is equals to the expected.
-   * 
-   * @param {String} expected
-   * 
-   * @return {IteratorFlow} this
-   */
-  andNextCharacterIs(expected) {
-    this.and(this.char.nextCharacter().is(expected));
-    return this;
-  }
-
-  /**
-   * Check if next character is not equals to the expected.
-   * 
-   * @param {String} expected
-   * 
-   * @return {IteratorFlow} this
-   */
-  andNextCharacterNotIs(expected) {
-    this.and(!this.char.nextCharacter().is(expected));
-    return this;
-  }
-
-  /**
-   * Check if previous character is equals to the expected.
-   * 
-   * @param {String} expected
-   * 
-   * @return {IteratorFlow} this
-   */
-  andPreviousCharacterIs(expected) {
-    this.and(this.char.previousCharacter().is(expected));
-    return this;
-  }
-
-  /**
-   * Check if previous character is not equals to the expected.
-   * 
-   * @param {String} expected
-   * 
-   * @return {IteratorFlow} this
-   */
-  andPreviousCharacterNotIs(expected) {
-    this.and(!this.char.previousCharacter().is(expected));
-    return this;
-  }
-
-  /**
-   * Find backwards any of the given chars.
-   * 
-   * This will change `this.iterator` which is passed 
-   * to `this.then` callback.
-   * 
-   * @param {String} ...chars
-   * 
-   * @return {IteratorFlow} this
-   */
-  findBackwards(...chars) {
-    const tex = this.tex;
-    let i = this.iterator;
-
-    while (i--) {
-      if (~chars.indexOf(tex[i])) {
-        break;
-      }
-    }
-
-    this.iterator = i;
-    return this;
-  }
-
-  /**
-   * Find forwards any of the given chars.
-   * 
-   * This will change `this.iterator` which is passed 
-   * to `this.then` callback.
-   * 
-   * @param {String} ...chars
-   * 
-   * @return {IteratorFlow} this
-   */
-  findForwards(...chars) {
-    const tex = this.tex;
-    const length = tex.length;
-    let i = this.iterator;
-
-    while (i++ < length) {
-      if (~chars.indexOf(tex[i])) {
-        break;
-      }
-    }
-
-    this.iterator = i;
-    return this;
-  }
-
-  /**
-   * If the assertion is truthy, call the given callback.
-   * 
-   * @param {Function} callback
-   * 
-   * @return {Void}
-   */
-  then(callback) {
-    if (!this.assertion) {
-      return;
-    }
-    callback(this.iterator);
-  }
-}
-
-/* harmony default export */ exports["a"] = Iterator;
-
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-"use strict";
-class Placer {
-  /**
-   * This is the Placer class.
-   * 
-   * It parse the current tex, and calculates the boundings of each
-   * variable/number/command elements to determinate if a cursor position
-   * change is possible (when the user clicks on `document.body`), it also
-   * specify which position the cursor should be moved to.
-   * 
-   * @param {Editor} editor
-   * 
-   * @constructor
-   */
-  constructor(editor) {
-    this.intervals = [];
-    this.onRequestPlacement = Function;
-    this.tex = editor.value;
-    this.$display = editor.$display;
-    this.findings = {};
-    this.isDebug = editor.debug;
+    this.cursorPoints = [];
+    this.elements = [];
+    this.newLines = {};
+    this.length = tex.length;
+    this.displayTex = '';
+    this.cursorIndex = cursorIndex;
+    this.isPartOfCommand = [];
 
     this.parse();
   }
 
   /**
-   * This will read an editor, and fire `onRequestPlacement` if cursor
-   * should be moved to another position.
-   * 
-   * This will return a new instance of Placer.
-   * 
-   * @param {Editor} editor
-   * @param {Function} onRequestPlacement
-   * 
-   * @return {Placer}
-   */
-  static read(editor, onRequestPlacement = Function) {
-    const placer = new Placer(editor);
-    placer.onRequestPlacement = onRequestPlacement;
-    return placer;
-  }
-
-  /**
-   * Debug helper function. Works just like console.log.
-   * 
-   * @return {Void}
-   */
-  debug(...args) {
-    if (!this.isDebug) {
-      return;
-    }
-    console.log(...args);
-  }
-
-  /**
-   * Add an interval to intervals list.
+   * Place the cursor at `displayTex` if it is
+   * in the given index, and was not placed before.
    * 
    * @param {Number} index
-   * @param {Number} startX
-   * @param {Number} endX
-   * @param {Number} startY
-   * @param {Number} endY
-   * @param {Boolean} useAllArea - If the click point is inside this 
-   *                               interval boundings, cursor will be
-   *                               placed at this interval index.
    * 
    * @return {Void}
    */
-  addInterval(index, startX, endX, startY, endY, useAllArea = false) {
-    this.intervals.push({
-      index, startX, endX, startY, endY, useAllArea
-    });
-  }
 
-  /**
-   * Returns the index which the cursor should be placed
-   * based on given `x`, and `y`.
-   * 
-   * @param {Object} interval
-   * @param {Number} x
-   * @param {Number} y
-   * @param {Number} i - Index of the given interval inside `this.intervals`.
-   * 
-   * @return {Number}
-   */
-  placeAtInterval(interval, x, y, i) {
-    const width = interval.endX - interval.startX;
-    let index = interval.index;
 
-    this.debug(`Interval X from ${interval.startX} to ${interval.endX} (Middle point x: ${interval.startX + (width / 2)}, width: ${width})`);
-    this.debug(`Interval Y from ${interval.startY} to ${interval.endY}`);
-
-    if (interval.useAllArea) {
-      return index;
-    }
-
-    if (x > interval.startX + (width / 2)) {
-      if (this.intervals[i + 1]) {
-        index = this.intervals[i + 1].index;
-      }
-      else {
-        index = this.tex.length;
+  _createClass(Tex, [{
+    key: 'addCursorToTexDisplay',
+    value: function addCursorToTexDisplay(index) {
+      if (!this.cursorPlaced && this.cursorIndex === index) {
+        this.cursorPlaced = true;
+        this.displayTex += cursorTex;
       }
     }
-    
-    this.debug(`[placeAtInterval] Cursor to be placed at ${index}.`);
 
-    return index;
-  }
+    /**
+     * Parse the given tex.
+     * 
+     * @return {Void}
+     */
 
-  /**
-   * Checks if the cursor must be moved, and if so,
-   * it fires `this.onRequestPlacement` with the position.
-   * 
-   * @param {Event} e
-   * 
-   * @return {Void}
-   */
-  fireClick(e) {
-    const { bottom } = this.$display.getBoundingClientRect();
-    const x = e.clientX;
-    const y = e.clientY;
-    let index = this.tex.length;
+  }, {
+    key: 'parse',
+    value: function parse() {
+      var cursorPoints = [];
+      var tex = this.tex;
+      var length = this.tex.length;
+      var cursorIndex = this.cursorIndex;
+      var i = 0;
 
-    this.debug(`You has clicked at (${x}, ${y}).`);
-    this.debug(this.intervals);
+      this.cursorPlaced = false;
 
-    // If there are no intervals, or the point `y` is
-    // not in the range of the editor's bounds, we just
-    // ignore the event. TODO: Check for y top.
+      for (; i < length; i++) {
+        var index = i;
+        var nextIndex = i + 1;
+        var char = tex[index];
+        var nextChar = tex[nextIndex];
+        var lastChar = tex[index - 1];
+        var nearClosure = (0, _utils.isAny)(nextChar, nearClosureHaystack);
+        var isComma = char === ',';
+        var isGrOrLeSign = (0, _utils.isAny)(char, ['<', '>']);
+        var isNumber = test.isNumber.exec(char);
+        var isVariable = test.isVariable.exec(char);
+        var isOperator = test.isOperator.exec(char);
+        var isNextCharEscapedOperator = test.isEscapedOperator.exec(nextChar);
+        var shouldBeAroundBraces = isComma || isNumber || isGrOrLeSign;
 
-    if (!this.intervals.length || y > bottom) {
-      return;
+        this.addCursorToTexDisplay(index);
+
+        if (shouldBeAroundBraces) {
+          this.displayTex += '{';
+        }
+
+        // Closing a command block, add spacing.
+        if (char === '}' && lastChar !== '\\') {
+          this.displayTex += '\\;';
+        }
+
+        // Add char to tex that are displayed on editor.
+        this.displayTex += char;
+
+        if (shouldBeAroundBraces) {
+          this.displayTex += '}';
+        }
+
+        // Check if character is a number.
+        if (isNumber) {
+          this.elements.push({
+            is: 'number',
+            type: 'mn',
+            index: index,
+            nearClosure: nearClosure
+          });
+        }
+
+        // Check if character is a variable.
+        if (isVariable) {
+          this.elements.push({
+            is: 'variable',
+            type: 'mi',
+            index: index,
+            nearClosure: nearClosure
+          });
+        }
+
+        // Check if character is an operator.
+        if (isOperator && !(0, _utils.inArray)(index, this.isPartOfCommand)) {
+          this.elements.push({
+            is: 'operator',
+            type: 'mo',
+            index: index,
+            nearClosure: nearClosure
+          });
+        }
+
+        if (char === '\\' && isNextCharEscapedOperator) {
+          var type = escType[nextChar] ? escType[nextChar] : 'mo';
+          this.elements.push({
+            is: 'operator',
+            type: type,
+            index: index,
+            nearClosure: nearClosure
+          });
+          this.displayTex += nextChar;
+          i += 1;
+        }
+
+        // Newline up ahead.
+        if (char === '\\' && nextChar === '\\') {
+          var newLine = { start: index, end: nextIndex };
+          this.newLines[index] = newLine;
+          this.newLines[nextIndex] = newLine;
+          this.displayTex += '\\';
+          this.elements.push({
+            is: 'eol',
+            type: 'block',
+            index: index
+          });
+          i += 1;
+        }
+
+        // A command.
+        if (char === '\\' && test.isVariable.exec(nextChar)) {
+          i = this.parseCommand(i);
+        }
+
+        // Sup and sub commands.
+        if ((0, _utils.isAny)(char, ['^', '_'])) {
+          i = this.parseCommand(i);
+        }
+
+        // Opening a command block.
+        if (char === '{') {
+          this.displayTex += '\\;';
+          if (nextChar === '}') {
+            this.addCursorToTexDisplay(nextIndex);
+            this.displayTex += emptyTex;
+          }
+          continue;
+        }
+
+        if (char === ' ') {
+          continue;
+        }
+
+        cursorPoints.push(index);
+      }
+
+      // Last line eol element.
+      if (length) {
+        this.elements.push({
+          is: 'eol',
+          type: 'block',
+          index: length
+        });
+      }
+
+      // Add cursor at the end if it was not placed.
+      this.addCursorToTexDisplay(length);
+
+      // Cursor can always be placed at the end.
+      cursorPoints.push(length);
+
+      this.cursorPoints = cursorPoints;
     }
-    
-    let found = false;
 
-    // First strategy: checks if the clicked point is inside a number/
-    // variable/operator bounding. If it is, place it where is proper. 
+    /**
+     * Parse a command that start at the given index.
+     * 
+     * @param {Number} i
+     * 
+     * @return {Number}
+     */
 
-    this.intervals.forEach((interval, i) => {
-      if (interval.startX <= x && x < interval.endX) {
-        if (interval.startY <= y && y < interval.endY) {
-          found = true;
-          index = this.placeAtInterval(interval, x, y, i);
+  }, {
+    key: 'parseCommand',
+    value: function parseCommand(i) {
+      var iterator = i;
+      var tex = this.tex;
+      var length = this.tex.length;
+      var cursorIndex = this.cursorIndex;
+      var firstChar = tex[iterator];
+      var opening = null; // the first place the cursor can be placed inside this command
+      var blocks = [];
+      var brackets = null;
+      var openBlocks = 0;
+      var type = '';
+      var subType = null;
+      var is = 'command'; // we assume it is a command but it can be operator or variable
+      var start = iterator; // index command starts
+      var end = null; // index command ends
+      var nearClosure = false;
+
+      switch (firstChar) {
+        case '^':
+          type = 'subsup';
+          subType = 'sup';
+          break;
+        case '_':
+          type = 'subsup';
+          subType = 'sub';
+          break;
+      }
+
+      for (i = iterator; i < length; i++) {
+        var char = tex[i];
+        var nextIndex = i + 1;
+        var nextChar = tex[nextIndex];
+        var isVariable = test.isVariable.exec(char);
+
+        if (opening === null) {
+          this.displayTex += !(0, _utils.isAny)(char, ['\\', '^', '_']) ? char : '';
+          if (isVariable) {
+            type += char;
+          }
+        }
+
+        // Bracket found!
+        if (char === '[') {
+          brackets = { openIndex: i };
+          if (opening === null) {
+            opening = i;
+          }
+
+          // Add symbol of empty.
+          if (nextChar === ']') {
+            this.displayTex += emptyTex;
+          }
+        }
+
+        // Closing brackets!
+        if (char === ']') {
+          brackets.closeIndex = i;
+          this.isPartOfCommand.push(i);
+        }
+
+        // Find a block being openned.
+        if (char === '{') {
+          // If it is this command block...
+          if (openBlocks === 0) {
+            blocks.push({ openIndex: i });
+          }
+          openBlocks += 1;
+          if (opening === null) {
+            opening = i;
+
+            this.displayTex += '\\;';
+
+            // Place the cursor if it is there.
+            this.addCursorToTexDisplay(nextIndex);
+
+            if (nextChar === '}') {
+              this.displayTex += emptyTex;
+            }
+          }
+        }
+
+        // Find a block being closed.
+        if (char === '}') {
+          openBlocks -= 1;
+          // If it is this command block...
+          if (openBlocks === 0) {
+            var key = blocks.length - 1;
+            blocks[key].closeIndex = i;
+            blocks[key].length = i - blocks[key].openIndex;
+          }
+        }
+
+        if (opening === null && char === ' ') {
+          type = this.decideType(type);
+          is = type === 'mo' ? 'operator' : 'variable';
+          end = i;
+          opening = i;
+          if ((0, _utils.isAny)(nextChar, nearClosureHaystack)) {
+            nearClosure = true;
+          }
+          break;
+        }
+
+        if (char === '}' && nextChar !== '{' && openBlocks === 0) {
+          end = i;
+          break;
         }
       }
-    });
 
-    // Second strategy: find the nearest element to the clicked point.
+      if (type === 'sqrt' && brackets !== null) {
+        type = 'root';
+      }
 
-    if (!found) {
-      let last = { interval: null, distance: null, i: null };
+      if (opening === null) {
+        throw new SyntaxError('Looks like this TeX is invalid. Now have a hard time finding where, lul.');
+      }
 
-      this.intervals.forEach((interval, i) => {
-        if (!(interval.startY < y && y < interval.endY)) {
-          return;
-        }
-        const distance = Math.min(Math.abs(interval.startX - x), Math.abs(interval.endX - x));
-        if (last.distance === null || distance < last.distance) {
-          last.interval = interval;
-          last.distance = distance;
-          last.i = i;
+      this.elements.push({
+        is: is,
+        type: type,
+        index: iterator,
+        nearClosure: nearClosure,
+        props: {
+          subType: subType,
+          start: start,
+          end: end,
+          opening: opening,
+          blocks: blocks,
+          brackets: brackets
         }
       });
 
-      if (!last.interval) {
-        return;
-      }
-
-      index = this.placeAtInterval(last.interval, x, y, last.i);
-      this.debug(`[fireClick] Not found a bounding, placeing at ${index}.`);
+      return opening;
     }
 
-    // Check if the clicked point is out of bounds.
-    // Since we can have now empty startX and endX, we need to
-    // iterate the intervals.
+    /**
+     * Decide the type based on the given type (lul).
+     *     \{type}
+     *     \alpha ---> mi
+     *     \geq   ---> mo
+     *     \sqrt  ---> msqrt
+     * 
+     * @param {String} type
+     * 
+     * @return {String}
+     */
 
-    // let i = 0;
-    // const length = this.intervals.length;
+  }, {
+    key: 'decideType',
+    value: function decideType(type) {
+      var list = {
+        'alpha': 'mi',
+        'beta': 'mi',
+        'gamma': 'mi',
+        'Gamma': 'mi',
+        'delta': 'mi',
+        'Delta': 'mi',
+        'epsilon': 'mi',
+        'varepsilon': 'mi',
+        'zeta': 'mi',
+        'eta': 'mi',
+        'theta': 'mi',
+        'vartheta': 'mi',
+        'Theta': 'mi',
+        'iota': 'mi',
+        'kappa': 'mi',
+        'lambda': 'mi',
+        'mu': 'mi',
+        'nu': 'mi',
+        'xi': 'mi',
+        'Xi': 'mi',
+        'pi': 'mi',
+        'Pi': 'mi',
+        'rho': 'mi',
+        'varrho': 'mi',
+        'sigma': 'mi',
+        'Sigma': 'mi',
+        'tau': 'mi',
+        'upsilon': 'mi',
+        'Upsilon': 'mi',
+        'phi': 'mi',
+        'varphi': 'mi',
+        'Phi': 'mi',
+        'chi': 'mi',
+        'psi': 'mi',
+        'Psi': 'mi',
+        'omega': 'mi',
+        'Omega': 'mi',
+        '%': 'mi'
+      };
 
-    // for (; i < length; i++) {
-    //   if (this.intervals[i].startX) {
-    //     if (x < this.intervals[i].startX) {
-    //       this.debug(`[fireClick] Out of display boundings. Placing at start.`);
-    //       index = 0;
-    //     }
-    //     break;
-    //   }
-    // }
-
-    // for (i = length - 1; i >= 0; i--) {
-    //   if (this.intervals[i].endX) {
-    //     if (x > this.intervals[i].endX) {
-    //       this.debug(`[fireClick] Out of display boundings. Placing at the end.`);
-    //       index = this.tex.length;
-    //     }
-    //     break;
-    //   }
-    // }
-
-    this.onRequestPlacement(index);
-  }
-
-  /**
-   * Find an element of the given type and add its interval data 
-   * to `this.intervals`.
-   * 
-   * @param {String} type
-   * @param {Number} index
-   * @param {Boolean} nearClosure
-   * 
-   * @return {Void}
-   */
-  find(type, index, nearClosure) {
-    this.findings[type] = this.findings[type] || 0;
-    const $el = this.$display.querySelectorAll(`.mjx-${type}`)[this.findings[type]];
-    const bounding = $el.getBoundingClientRect();
-    this.addInterval(index, bounding.left, bounding.right, bounding.top, bounding.bottom);
-    this.findings[type] += 1;
-    if (nearClosure) {
-      this.addInterval(index + 1, 0, 0, 0, 0);
+      return list.hasOwnProperty(type) ? list[type] : 'mo';
     }
-  }
+  }]);
 
-  /**
-   * Find a command element.
-   * 
-   * @param {String} command
-   * @param {Number} index
-   * 
-   * @return {Void}
-   */
-  findCommand(command, index) {
-    command = command.replace(/[\[\{].*(\]\{.*)?/, '');
-    const name = command.slice(1);
-    this.findings[name] = this.findings[name] || 0;
-    const $el = this.$display.querySelectorAll(`.mjx-m${name}`)[this.findings[name]];
-    const bounding = $el.getBoundingClientRect();
+  return Tex;
+}();
 
-    switch (name) {
-      case 'frac':
-        const $numerator = $el.querySelector('.mjx-numerator');
-        const $denominator = $el.querySelector('.mjx-denominator');
-        const numBounding = $numerator.getBoundingClientRect();
-        const denBounding = $denominator.getBoundingClientRect();
-        const boundings = [numBounding, denBounding];
-        var { blocks } = this.parseCommandAt(index);
-
-        boundings.forEach((bounding, i) => {
-          if ((blocks[i].closeIndex - blocks[i].openIndex) === 1) {
-            this.addInterval(blocks[i].closeIndex, bounding.left, bounding.right, bounding.top, bounding.bottom, true);
-          }
-        });
-
-        break;
-
-      case 'root':
-      case 'sqrt':
-        var { blocks, brackets } = this.parseCommandAt(index);
-
-        if (brackets.closeIndex && (brackets.closeIndex - brackets.openIndex) === 1) {
-          const $root = $el.querySelector('.mjx-root .mjx-char');
-          const { left, right, top, bottom } = $root.getBoundingClientRect();
-          this.addInterval(brackets.closeIndex, left, right, top, bottom, true);
-        }
-        if ((blocks[0].closeIndex - blocks[0].openIndex) === 1) {
-          const $box = $el.querySelector('.mjx-box');
-          const { left, right, top, bottom } = $box.getBoundingClientRect();
-          this.addInterval(blocks[0].closeIndex, left, right, top, bottom, true);
-        }
-        break;
-    }
-  }
-
-  /**
-   * Parse the editor's tex.
-   * 
-   * @return {Void}
-   */
-  parse() {
-    const tex = this.tex;
-    const length = tex.length;
-    let i = 0;
-
-    const test = {
-      isNumber: /\d/,
-      isVariable: /\w/,
-      isOperator: /[\+\-\=\,\.]/
-    }
-
-    for (; i < length; i++) {
-      const char = tex[i];
-      let nearClosure = (!!~['}', ']', '\\'].indexOf(tex[i + 1]));
-
-      if (test.isNumber.exec(char)) {
-        this.find('mn', i, nearClosure);
-        continue;
-      }
-
-      if (test.isVariable.exec(char)) {
-        this.find('mi', i, nearClosure);
-        continue;
-      }
-
-      if (test.isOperator.exec(char)) {
-        this.find('mo', i, nearClosure);
-        continue;
-      }
-
-      // Newline, so we skip.
-      if (char === '\\' && tex[i + 1] === '\\') {
-        i += 1;
-        continue;
-      }
-
-      if (char === '\\') {
-        let j = i;
-        let command = '';
-        for (; j < length; j++) {
-          const subchar = tex[j];
-          nearClosure = (!!~['}', ']', '\\'].indexOf(tex[j + 1]))
-          command += subchar;
-          if (~[' ', '{', '['].indexOf(subchar)) {
-            const list = {
-              '\\cdot': 'mo',
-              '\\div': 'mo'
-            };
-            const trimmed = command.trim();
-            const type = list[trimmed] ? list[trimmed] : 'mi';
-            if (subchar === ' ') {
-              this.find(type, i, nearClosure);
-            }
-            else {
-              if (command.match(/\\sqrt\[/)) {
-                command = command.replace('sqrt', 'root');
-              }
-              this.findCommand(command, i);
-            }
-            i = j;
-            break;
-          }
-        }
-      }
-    }
-  }
-
-  parseCommandAt(i) {
-    const length = this.tex.length;
-    let blocks = [];
-    let brackets = { openIndex: null, closeIndex: null };
-    let openBlocks = 0;
-
-    for (; i < length; i++) {
-      const char = this.tex[i];
-      if (char === '[') {
-        brackets.openIndex = i;
-      }
-      if (char === ']') {
-        brackets.closeIndex = i;
-      }
-      if (char === '{') {
-        if (openBlocks === 0) {
-          blocks.push({ openIndex: i });
-        }
-        openBlocks += 1;
-      }
-      if (char === '}') {
-        openBlocks -= 1;
-        if (openBlocks === 0) {
-          blocks[blocks.length - 1].closeIndex = i;
-        }
-      }
-      if (char === '}' && this.tex[i + 1] !== '{') {
-        break;
-      }
-    }
-
-    return {
-      blocks,
-      brackets
-    };
-  }
-}
-
-/* harmony default export */ exports["a"] = Placer;
+exports.default = Tex;
 
 /***/ },
-/* 5 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__styles__ = __webpack_require__(6);
-/* harmony export (immutable) */ exports["a"] = extendMathJax;
+'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = extendMathJax;
+
+var _styles = __webpack_require__(9);
+
+var _styles2 = _interopRequireDefault(_styles);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * This will extend MathJax so that we can put our simple
  * cursor there.
  */
 function extendMathJax() {
-  const TEX = MathJax.InputJax.TeX;
-  const MML = MathJax.ElementJax.mml;
+  var TEX = MathJax.InputJax.TeX;
+  var MML = MathJax.ElementJax.mml;
 
   // This removes the pause (in milliseconds) between input and output 
   // phases of MathJax's processing. So it looks seamless!
 
   MathJax.Hub.processSectionDelay = 0;
 
-  MathJax.Hub.Register.StartupHook("TeX Jax Ready", () => {
-    const defaults = {
+  MathJax.Hub.Register.StartupHook("TeX Jax Ready", function () {
+    var defaults = {
       mathvariant: MML.INHERIT,
       mathsize: MML.INHERIT,
       mathbackground: MML.INHERIT,
@@ -1502,45 +2670,56 @@ function extendMathJax() {
     MML.mcursor = MML.mbase.Subclass({
       type: 'cursor',
       isToken: true,
-      isSpacelike: () => true,
+      isSpacelike: function isSpacelike() {
+        return true;
+      },
       texClass: MML.TEXCLASS.ORD,
-      defaults
+      defaults: defaults
     });
 
     MML.misEmpty = MML.mbase.Subclass({
       type: 'isEmpty',
       isToken: true,
-      isSpacelike: () => true,
+      isSpacelike: function isSpacelike() {
+        return true;
+      },
       texClass: MML.TEXCLASS.ORD,
-      defaults
+      defaults: defaults
     });
 
     TEX.Parse.Augment({
-      Cursor(name) {
-        const $cursor = MML.mcursor('0');
+      Cursor: function Cursor(name) {
+        var $cursor = MML.mcursor('0');
         this.Push($cursor);
       },
-
-      IsEmpty(name) {
-        const $isEmpty = MML.misEmpty('?');
+      IsEmpty: function IsEmpty(name) {
+        var $isEmpty = MML.misEmpty('?');
         this.Push($isEmpty);
       }
     });
   });
 
-  MathJax.Ajax.Styles(__WEBPACK_IMPORTED_MODULE_0__styles__["a" /* default */]);
+  MathJax.Ajax.Styles(_styles2.default);
 }
 
 /***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
+/* 9 */
+/***/ function(module, exports) {
 
 "use strict";
-const animation = 
-`from, to { border-color: #000 }
- 50% { border-color: transparent }`;
+'use strict';
 
-/* harmony default export */ exports["a"] = {
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _mjxCursor$MjxCur;
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var animation = 'from, to { border-color: #000 }\n 50% { border-color: transparent }';
+
+exports.default = (_mjxCursor$MjxCur = {
   '.mjx-cursor': {
     '-webkit-animation': '1s mj-ed-blink step-end infinite',
     '-moz-animation': '1s mj-ed-blink step-end infinite',
@@ -1577,290 +2756,11 @@ const animation =
     color: '#ccc'
   },
 
-  '@keyframes mj-ed-blink': animation,
-  '@keyframes mj-ed-blink': animation,
-  '@-moz-keyframes mj-ed-blink': animation,
-  '@-webkit-keyframes mj-ed-blink': animation,
-  '@-ms-keyframes mj-ed-blink': animation,
-  '@-o-keyframes mj-ed-blink': animation
-};
-
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ exports["a"] = mustFindElement;
-/* harmony export (immutable) */ exports["b"] = insertBetween;
-/* harmony export (immutable) */ exports["d"] = removeClass;
-/* harmony export (immutable) */ exports["c"] = addClass;
-/* unused harmony export toArray */
-/**
- * Tries to find the specified element. If it fails, an error is thrown.
- * 
- * @param {DOMElement|string} el - An element or a selector.
- * 
- * @return {DOMElement}
- */
-function mustFindElement(el) {
-  const error = new Error('You must define a target element.');
-
-  if (!el) {
-    throw error;
-  }
-
-  if (typeof el === 'string') {
-    const $el = document.querySelector(el);
-    if (!$el) {
-      throw error;
-    }
-    return $el;
-  }
-
-  // Yeah, we just assume an element was given...
-  return el;
-}
-
-/**
- * Insert a text in the middle of the given string.
- * 
- * @param {String} string
- * @param {Number} index
- * @param {String} fragment
- * 
- * @return {String}
- */
-function insertBetween(string, index, fragment) {
-  const before = string.slice(0, index);
-  const after = string.slice(index);
-  return before + fragment + after;
-}
-
-/**
- * Remove a class of an element.
- * 
- * @param {DOMElement} $el
- * @param {String} className
- * 
- * @return {Void}
- */
-function removeClass($el, className) {
-  const classes = $el.className.split(' ');
-  let finalValue = '';
-
-  for (const c of classes) {
-    if (c !== className) {
-      finalValue += ` ${c}`;
-    }
-  }
-
-  $el.className = finalValue.trim();
-}
-
-/**
- * Add a class to an element.
- * 
- * @param {DOMElement} $el
- * @param {String} className
- * 
- * @return {Void}
- */
-function addClass($el, className) {
-  const classes = $el.className.split(' ');
-  if (!(~classes.indexOf(className))) {
-    $el.className += ` ${className}`;
-  }
-  $el.className = $el.className.trim();
-}
-
-/**
- * Converts a DOM node list to array.
- * 
- * @param {DOMNodeList}
- * 
- * @return {Array}
- */
-function toArray(children) {
-  const slice = [].slice;
-  return slice.call(children);
-}
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-"use strict";
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _mathjaxEditor = __webpack_require__(0);
-
-var _mathjaxEditor2 = _interopRequireDefault(_mathjaxEditor);
-
-var _loadStyles = __webpack_require__(9);
-
-var _loadStyles2 = _interopRequireDefault(_loadStyles);
-
-var _keyboard = __webpack_require__(10);
-
-var _keyboard2 = _interopRequireDefault(_keyboard);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Element = null;
-var keyRows = _keyboard2.default.keyRows,
-    keyColumns = _keyboard2.default.keyColumns,
-    getKey = _keyboard2.default.getKey;
-
-var MathJaxEditorKeyboard = function () {
-  function MathJaxEditorKeyboard(options) {
-    var _this = this;
-
-    _classCallCheck(this, MathJaxEditorKeyboard);
-
-    Element = Element || MathJax.HTML.Element;
-
-    var $container = Element('div', { className: 'mjk-container' });
-    var $keyboard = Element('div', { className: 'mjk-keyboard' });
-
-    $container.appendChild($keyboard);
-    document.body.appendChild($container);
-
-    var editor = new _mathjaxEditor2.default(options);
-    editor.on('focus', this.showKeyboard.bind(this));
-    editor.on('blur', this.hideKeyboard.bind(this));
-
-    this.$keyboard = $keyboard;
-    this.editor = editor;
-
-    setTimeout(function () {
-      return _this.showKeyboard();
-    });
-  }
-
-  _createClass(MathJaxEditorKeyboard, [{
-    key: 'showKeyboard',
-    value: function showKeyboard() {
-      // This should be at least 320px, 20 for padding.
-      var width = this.$keyboard.offsetWidth - 20;
-      var keyWidth = width / keyColumns;
-      var keyWidthPx = keyWidth + 'px';
-      var i = 0;
-      for (; i < keyRows; i++) {
-        var $row = Element('div', { className: 'mjk-keyRow' });
-        var j = 0;
-        for (j; j < keyColumns; j++) {
-          var key = getKey(i, j);
-          var $key = Element('div', {
-            className: 'mjk-key',
-            style: {
-              fontSize: '16px',
-              height: keyWidthPx,
-              width: keyWidthPx
-            }
-          });
-          $key.innerHTML = key.getLabel();
-          $row.appendChild($key);
-        }
-        this.$keyboard.append($row);
-      }
-    }
-  }, {
-    key: 'hideKeyboard',
-    value: function hideKeyboard() {}
-  }]);
-
-  return MathJaxEditorKeyboard;
-}();
-
-module.exports = MathJaxEditorKeyboard;
-
-/***/ },
-/* 9 */
-/***/ function(module, exports) {
-
-"use strict";
-'use strict';
-
-function onLoad() {
-  var styles = {
-    '.mjk-container': {
-      'background-color': 'rgba(0, 0, 0, 0.5)',
-      height: '100%',
-      left: 0,
-      position: 'absolute',
-      top: 0,
-      width: '100%'
-    },
-
-    '.mjk-keyboard': {
-      'background-color': '#333',
-      bottom: 0,
-      height: '320px',
-      left: 0,
-      'padding-top': '1em',
-      position: 'absolute',
-      width: '320px'
-    },
-
-    '.mjk-keyRow': {
-      'align-items': 'center',
-      display: 'flex',
-      'justify-content': 'center',
-      'overflow': 'hidden'
-    },
-
-    '.mjk-key': {
-      'align-items': 'center',
-      color: '#fff',
-      display: 'flex',
-      float: 'left',
-      'justify-content': 'center',
-      'text-align': 'center'
-    }
-  };
-
-  MathJax.Ajax.Styles(styles);
-}
-
-window.addEventListener('load', onLoad);
+  '@keyframes mj-ed-blink': animation
+}, _defineProperty(_mjxCursor$MjxCur, '@keyframes mj-ed-blink', animation), _defineProperty(_mjxCursor$MjxCur, '@-moz-keyframes mj-ed-blink', animation), _defineProperty(_mjxCursor$MjxCur, '@-webkit-keyframes mj-ed-blink', animation), _defineProperty(_mjxCursor$MjxCur, '@-ms-keyframes mj-ed-blink', animation), _defineProperty(_mjxCursor$MjxCur, '@-o-keyframes mj-ed-blink', animation), _mjxCursor$MjxCur);
 
 /***/ },
 /* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-"use strict";
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _Key = __webpack_require__(11);
-
-var _Key2 = _interopRequireDefault(_Key);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var keys = [[{ label: '(' }, { label: ')' }, { label: '|' }, { label: '\[' }, { label: '\]' }, { label: '\\sqrt{a}' }, { label: '\\sqrt[n]{a}' }, { label: '\\geq' }], [{ label: 'x' }, { label: '7' }, { label: '8' }, { label: '9' }, { label: '\\frac{a}{b}' }, { label: 'a^n' }, { label: 'a_n' }, { label: '\\leq' }], [{ label: 'y' }, { label: '4' }, { label: '5' }, { label: '6' }, { label: ']' }, { label: '\\sqrt{a}' }, { label: '\\sqrt[n]{a}' }, { label: '>' }], [{ label: 'z' }, { label: '1' }, { label: '2' }, { label: '3' }, { label: '-' }, { label: '+' }, { label: '\\div' }, { label: '<' }], [null, { label: ',' }, { label: '0' }, { label: '.' }, { label: '%' }, { label: '\\%' }, { label: '=' }, null, null], [{ $label: '&#xE314;' }, // Left arrow (move cursor)
-{ $label: '&#xE315;' }, // Right arrow
-{ $label: '&#xE14A;' }, // Backspace
-null, null, null, null, null]];
-
-exports.default = {
-  keyRows: keys.length,
-  keyColumns: keys[0].length,
-
-  getKey: function getKey(i, j) {
-    return new _Key2.default(keys[i][j]);
-  }
-};
-
-/***/ },
-/* 11 */
 /***/ function(module, exports) {
 
 "use strict";
@@ -1892,12 +2792,310 @@ var Key = function () {
       }
       return '<i class="material-icons">' + this.key.$label + '</i>';
     }
+  }, {
+    key: 'getClickListener',
+    value: function getClickListener() {
+      if (!this.key || !this.key.onClick) {
+        return function () {
+          return null;
+        };
+      }
+      return this.key.onClick;
+    }
   }]);
 
   return Key;
 }();
 
 exports.default = Key;
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _Key = __webpack_require__(10);
+
+var _Key2 = _interopRequireDefault(_Key);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var keys = [[{ label: '(', onClick: function onClick(editor) {
+    return editor.insertSymbol('(');
+  } }, { label: ')', onClick: function onClick(editor) {
+    return editor.insertSymbol(')');
+  } }, { label: '|', onClick: function onClick(editor) {
+    return editor.insertSymbol('|');
+  } }, { label: '[', onClick: function onClick(editor) {
+    return editor.insertSymbol('[');
+  } }, { label: ']', onClick: function onClick(editor) {
+    return editor.insertSymbol(']');
+  } }, { label: '\\sqrt{a}', onClick: function onClick(editor) {
+    return editor.insertCommand('\\sqrt', 1);
+  } }, { label: '\\sqrt[n]{a}', onClick: function onClick(editor) {
+    return editor.insertCommand('\\sqrt', 1, true);
+  } }, { label: '\\geq', onClick: function onClick(editor) {
+    return editor.insertCommand('\\geq');
+  } }], [{ label: 'x', onClick: function onClick(editor) {
+    return editor.insert('x');
+  } }, { label: '7', onClick: function onClick(editor) {
+    return editor.insert('7');
+  } }, { label: '8', onClick: function onClick(editor) {
+    return editor.insert('8');
+  } }, { label: '9', onClick: function onClick(editor) {
+    return editor.insert('9');
+  } }, { label: '\\frac{a}{b}', onClick: function onClick(editor) {
+    return editor.insertCommand('\\frac', 2);
+  } }, { label: 'a^n', onClick: function onClick(editor) {
+    return editor.insertCommand('^', 1);
+  } }, { label: 'a_n', onClick: function onClick(editor) {
+    return editor.insertCommand('_', 1);
+  } }, { label: '\\leq', onClick: function onClick(editor) {
+    return editor.insertCommand('\\leq');
+  } }], [{ label: 'y', onClick: function onClick(editor) {
+    return editor.insert('y');
+  } }, { label: '4', onClick: function onClick(editor) {
+    return editor.insert('4');
+  } }, { label: '5', onClick: function onClick(editor) {
+    return editor.insert('5');
+  } }, { label: '6', onClick: function onClick(editor) {
+    return editor.insert('6');
+  } }, null, null, null, { label: '>', onClick: function onClick(editor) {
+    return editor.insertSymbol('>');
+  } }], [{ label: 'z', onClick: function onClick(editor) {
+    return editor.insert('z');
+  } }, { label: '1', onClick: function onClick(editor) {
+    return editor.insert('1');
+  } }, { label: '2', onClick: function onClick(editor) {
+    return editor.insert('2');
+  } }, { label: '3', onClick: function onClick(editor) {
+    return editor.insert('3');
+  } }, { label: '-', onClick: function onClick(editor) {
+    return editor.insertSymbol('-');
+  } }, { label: '+', onClick: function onClick(editor) {
+    return editor.insertSymbol('+');
+  } }, { label: '\\div', onClick: function onClick(editor) {
+    return editor.insertCommand('\\div');
+  } }, { label: '<', onClick: function onClick(editor) {
+    return editor.insertSymbol('<');
+  } }], [null, { label: ',', onClick: function onClick(editor) {
+    return editor.insertSymbol(',');
+  } }, { label: '0', onClick: function onClick(editor) {
+    return editor.insert('0');
+  } }, { label: '.', onClick: function onClick(editor) {
+    return editor.insertSymbol('.');
+  } }, null, { label: '\\%', onClick: function onClick(editor) {
+    return editor.insertSymbol('%');
+  } }, { label: '=', onClick: function onClick(editor) {
+    return editor.insertSymbol('=');
+  } }, null, null], [{ $label: '&#xE314;', onClick: function onClick(editor) {
+    return editor.moveCursorLeft();
+  } }, // Left arrow (move cursor)
+{ $label: '&#xE315;', onClick: function onClick(editor) {
+    return editor.moveCursorRight();
+  } }, // Right arrow
+{ $label: '&#xE14A;', onClick: function onClick(editor) {
+    return editor.erase();
+  } }, // Backspace
+null, null, null, null, null]];
+
+exports.default = {
+  keyList: keys,
+  keyRows: keys.length,
+  keyColumns: keys[0].length,
+
+  getKey: function getKey(i, j) {
+    return new _Key2.default(keys[i][j]);
+  }
+};
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
+
+"use strict";
+'use strict';
+
+function onLoad() {
+  var styles = {
+    '.mjk-container': {
+      'background-color': 'rgba(0, 0, 0, 0.5)',
+      height: '100%',
+      left: 0,
+      position: 'absolute',
+      top: 0,
+      width: '100%'
+    },
+
+    '.mjk-keyboard': {
+      'background-color': '#f1f1f1',
+      border: '1px solid #ccc',
+      bottom: 0,
+      left: 0,
+      'padding': '1em 0',
+      position: 'absolute',
+      width: '320px'
+    },
+
+    '.mjk-keyboard.isMobile': {
+      border: 'none',
+      'border-top': '1px solid #ccc'
+    },
+
+    '.mjk-keyRow': {
+      'align-items': 'center',
+      display: 'flex',
+      'justify-content': 'center',
+      'overflow': 'hidden'
+    },
+
+    '.mjk-key': {
+      'align-items': 'center',
+      'background-color': 'transparent',
+      border: 'none',
+      color: '#333',
+      display: 'flex',
+      float: 'left',
+      'justify-content': 'center',
+      'text-align': 'center'
+    },
+
+    '.mjk-input': {
+      'background-color': '#fff',
+      position: 'absolute !important',
+      'overflow-x': 'scroll'
+    },
+
+    '.mjk-input .mj-ed-display': {
+      border: 'none !important'
+    }
+  };
+
+  MathJax.Ajax.Styles(styles);
+}
+
+window.addEventListener('load', onLoad);
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.applyStyles = applyStyles;
+exports.emptyElement = emptyElement;
+exports.findNode = findNode;
+/**
+ * Apply styles to an element.
+ * 
+ * @param {DOMElement} $el
+ * @param {Object} styles
+ * 
+ * @return {Void}
+ */
+function applyStyles($el, styles) {
+  Object.keys(styles).forEach(function (property) {
+    var value = styles[property];
+    if (typeof value === 'number') {
+      value = value + 'px';
+    }
+    $el.style[property] = value;
+  });
+}
+
+/**
+ * Removes all children of an element.
+ * 
+ * @param {DOMElement} $el
+ * 
+ * @return {Void}
+ */
+function emptyElement($el) {
+  while ($el.firstChild) {
+    $el.removeChild($el.firstChild);
+  }
+}
+
+/**
+ * Find a parent node.
+ * 
+ * @param {DOMElement} $el
+ * 
+ * @return {Boolean}
+ */
+function findNode($at, $el) {
+  var $parent = $at;
+  while ($parent) {
+    if ($parent === $el) {
+      return true;
+    }
+    $parent = $parent.parentNode;
+  }
+  return false;
+}
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Core = __webpack_require__(3);
+
+var _Core2 = _interopRequireDefault(_Core);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var MathJaxEditorKeyboard = function () {
+  /**
+   * Surface on top of Core class.
+   * 
+   * @param {Object} options
+   * 
+   * @constructor
+   */
+  function MathJaxEditorKeyboard(options) {
+    _classCallCheck(this, MathJaxEditorKeyboard);
+
+    var core = new _Core2.default(options);
+
+    this.editor = core.editor;
+    this.version = '1.0.0';
+  }
+
+  /**
+   * Get editor's value.
+   * 
+   * @return {String}
+   */
+
+
+  _createClass(MathJaxEditorKeyboard, [{
+    key: 'getValue',
+    value: function getValue() {
+      return this.editor.getValue();
+    }
+  }]);
+
+  return MathJaxEditorKeyboard;
+}();
+
+module.exports = MathJaxEditorKeyboard;
 
 /***/ }
 /******/ ]);
