@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
+<head></head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MathJax Mathematics Editor Keyboard</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
@@ -11,6 +13,7 @@
       border-radius: 3px;
       font-size: 2em;
       padding: 0.5em 0.8em;
+      box-sizing: border-box;
     }
     
     .mj-ed-display.isFocused {
@@ -32,7 +35,8 @@
   <script>
     window.onload = function () {
       const editor = new MathJaxEditorKeyboard({
-        el: '#editor'
+        el: '#editor',
+        debug: false
       });
     };
   </script>
