@@ -12,7 +12,7 @@ class MathJaxEditorKeyboard {
     const core = new Core(options);
 
     this.editor = core.editor;
-    this.version = '1.0.0';
+    this.version = '1.0.1';
   }
 
   /**
