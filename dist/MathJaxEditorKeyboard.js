@@ -383,7 +383,7 @@ exports.default = {
 
   nearClosureHaystack: ['}', ']'],
 
-  operators: ['+', '-', '=', '<', '>', ',', '.', ':', ';', '?', '(', ')', '[', ']'],
+  operators: ['+', '-', '=', '<', '>', ',', '.', ':', ';', '?', '(', ')', '[', ']', '|'],
 
   escapedOperators: ['{', '}', '%'],
 
@@ -1449,7 +1449,7 @@ var MathJaxEditor = function () {
     var core = new _Editor2.default(options);
 
     this.core = core;
-    this.version = '1.2.7';
+    this.version = '1.2.8';
   }
 
   /**
@@ -3075,7 +3075,7 @@ var MathJaxEditorKeyboard = function () {
     var core = new _Core2.default(options);
 
     this.editor = core.editor;
-    this.version = '1.0.0';
+    this.version = '1.0.1';
   }
 
   /**
