@@ -1313,7 +1313,7 @@ is-number@^2.0.2, is-number@^2.1.0:
 
 is-posix-bracket@^0.1.0:
   version "0.1.1"
-  resolved "https://registry.yarnpkg.com/is-posix-bracket/-/is-posix-bracket-0.1.1.tgz#3334dc79774368e92f016e6fbc0a88f5cd6e6bc4"
+  resolved "http://registry.npmjs.org/is-posix-bracket/-/is-posix-bracket-0.1.1.tgz#3334dc79774368e92f016e6fbc0a88f5cd6e6bc4"
 
 is-primitive@^2.0.0:
   version "2.0.0"
@@ -1459,8 +1459,8 @@ loose-envify@^1.0.0:
     js-tokens "^2.0.0"
 
 mathjax-editor@^1.1.5:
-  version "1.2.7"
-  resolved "https://registry.yarnpkg.com/mathjax-editor/-/mathjax-editor-1.2.7.tgz#41383bb94a78fc5b87b967d12a294a083d697613"
+  version "1.2.8"
+  resolved "https://registry.yarnpkg.com/mathjax-editor/-/mathjax-editor-1.2.8.tgz#b3432da72809c5f1c8f51b7425af877e5bb79827"
 
 memory-fs@^0.3.0, memory-fs@~0.3.0:
   version "0.3.0"
