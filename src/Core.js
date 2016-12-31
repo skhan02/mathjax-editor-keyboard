@@ -1,10 +1,9 @@
 import MathJaxEditor from 'mathjax-editor';
+import Keys from './Keys';
 import { addClass, removeClass } from 'mathjax-editor/src/utils';
-import { applyStyles, emptyElement, findNode } from './utils';
+import { applyStyles, emptyElement, findNode, findClass } from './utils';
 import styles from './styles';
-import keys from './keys';
 
-const { keyRows, keyColumns, getKey, keyList } = keys;
 const keyboardWidth = 320;
 
 class Core {
@@ -30,13 +29,14 @@ class Core {
     this.editor = editor;
     this.isMobile = (viewportWidth < 640);
     this.isVisible = false;
+    this.pageIndex = 0;
     this.$container = $container;
     this.$keyboard = $keyboard;
     this.$editorContainer = editor.core.$container;
     this.$editorContainerParent = editor.core.$container.parentNode;
     this.$editorInput = editor.core.$input;
 
-    document.addEventListener('click', this.handleDocumentClick.bind(this));
+    document.addEventListener('mousedown', this.handleDocumentClick.bind(this));
 
     this.hideKeyboard();
   }
@@ -48,19 +48,23 @@ class Core {
    */
   render() {
     const Element = MathJax.HTML.Element;
-    const { $keyboard, editor } = this;
+    const { $keyboard, editor, pageIndex } = this;
+
+    const keys = Keys.getPage(pageIndex);
+    const keyRows = Keys.getKeyColumns();
+    const keyColumns = Keys.getKeyColumns();
     const keyWidth = (keyboardWidth - 20) / keyColumns;
     const keyWidthPx = `${keyWidth}px`;
 
     emptyElement($keyboard);
     $keyboard.style.width = `${keyboardWidth}px`;
 
-    keyList.forEach((rows, i) => {
+    keys.forEach((rows, i) => {
       const $row = Element('div', { className: 'mjk-keyRow' });
 
       rows.forEach((column, j) => {
-        const key = getKey(i, j);
-        const listener = key.getClickListener();
+        const key = Keys.getKey(pageIndex, i, j);
+
         const $key = Element('button', {
           className: 'mjk-key',
           style: {
@@ -69,18 +73,25 @@ class Core {
             width: keyWidthPx
           }
         });
+        
+        if (key.exists()) {
+          const listener = key.getClickListener();
 
-        $key.innerHTML = key.getLabel();
-        $key.addEventListener('click', () => {
-          listener(editor);
-          this.updateInputElement();
-        });
+          $key.innerHTML = key.getLabel();
+          $key.addEventListener('click', () => {
+            listener(editor, this);
+            this.updateInputElement();
+          }); 
+        }
+        else {
+          $key.setAttribute('disabled', 'disabled');
+        }
 
         $row.appendChild($key);
       });
 
       $keyboard.appendChild($row);
-    })
+    });
 
     MathJax.Hub.Typeset($keyboard);
     this.updateInputElement();
@@ -215,15 +226,59 @@ class Core {
     const { $container, $editorContainer } = this;
     const $target = e.target;
 
+    if (e.button !== 0) {
+      return;
+    }
+
     if (this.isMobile && $target === $container) {
       return this.hideKeyboard();
     }
     if (findNode($target, $editorContainer)) {
       return this.showKeyboard();
     }
-    if (!findNode($target, $container)) {
+    if (!findNode($target, $container) && !findClass($target, 'mjk-key')) {
       return this.hideKeyboard();
     }
+  }
+  
+  /**
+   * Go to next keys page.
+   * 
+   * @return {Void}
+   */
+  nextPage() {
+    const length = Keys.getPagesLength();
+    let index;
+
+    if (this.pageIndex === length - 1) {
+      index = 0;
+    }
+    else {
+      index = this.pageIndex + 1;
+    }
+
+    this.pageIndex = index;
+    this.render();
+  }
+
+  /**
+   * Go to previous key page.
+   * 
+   * @return {Void}
+   */
+  previousPage() {
+    const length = Keys.getPagesLength();
+    let index;
+
+    if (this.pageIndex === 0) {
+      index = length - 1;
+    }
+    else {
+      index = this.pageIndex - 1;
+    }
+    
+    this.pageIndex = index;
+    this.render();
   }
 }
 
