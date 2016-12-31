@@ -46,3 +46,25 @@ export function findNode($at, $el) {
   }
   return false;
 }
+
+/**
+ * Find a class in a node.
+ * 
+ * @param {DOMElement} $el
+ * @param {String} className
+ * 
+ * @return {Boolean}
+ */
+export function findClass($el, className) {
+  let $parent = $el;
+  while ($parent) {
+    if (!$parent) {
+      return false;
+    }
+    if ($parent.className && ~$parent.className.indexOf(className)) {
+      return true;
+    }
+    $parent = $parent.parentNode;
+  }
+  return false;
+}
