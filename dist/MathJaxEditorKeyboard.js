@@ -82,7 +82,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 14);
+/******/ 	return __webpack_require__(__webpack_require__.s = 15);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -100,7 +100,6 @@ exports.insertBetween = insertBetween;
 exports.removeClass = removeClass;
 exports.addClass = addClass;
 exports.toArray = toArray;
-exports.isAny = isAny;
 exports.inArray = inArray;
 exports.repeat = repeat;
 exports.removeFragment = removeFragment;
@@ -112,7 +111,7 @@ exports.listToCharacterRegex = listToCharacterRegex;
  * 
  * @return {DOMElement}
  */
-function mustFindElement(el) {
+function mustFindElement(el, tagName) {
   var error = new Error('You must define a target element.');
 
   if (!el) {
@@ -120,11 +119,14 @@ function mustFindElement(el) {
   }
 
   if (typeof el === 'string') {
-    var $el = document.querySelector(el);
-    if (!$el) {
+    el = document.querySelector(el);
+    if (!el) {
       throw error;
     }
-    return $el;
+  }
+
+  if (el.tagName.toLowerCase() !== tagName.toLowerCase()) {
+    throw new Error('The target element must be <' + tagName + '>.');
   }
 
   // Yeah, we just assume an element was given...
@@ -224,17 +226,8 @@ function toArray(children) {
  * 
  * @return {Boolean}
  */
-function isAny(needle, haystack) {
-  return !!~haystack.indexOf(needle);
-}
-
-/**
- * Same as `isAny`. Just better naming.
- * 
- * @see isAny
- */
 function inArray(needle, haystack) {
-  return isAny(needle, haystack);
+  return !!~haystack.indexOf(needle);
 }
 
 /**
@@ -377,11 +370,15 @@ exports.default = {
 
   emptyTex: '\\isEmpty',
 
+  spacingTex: '\\;',
+
   number: /^[0-9]$/,
 
-  variable: /^[a-z]$/,
+  variable: /^[a-zA-Z]$/,
 
   nearClosureHaystack: ['}', ']'],
+
+  supOrSub: ['^', '_'],
 
   operators: ['+', '-', '=', '<', '>', ',', '.', ':', ';', '?', '(', ')', '[', ']', '|'],
 
@@ -389,7 +386,14 @@ exports.default = {
 
   escType: {
     '%': 'mi'
-  }
+  },
+
+  charToCommand: {
+    '*': 'cdot',
+    '/': 'div'
+  },
+
+  relationCommands: ['geq', 'leq', 'll', 'gg', 'doteq', 'equiv', 'approx', 'cong', 'simeq', 'sim', 'propto', 'neq', 'subset', 'subseteq', 'nsubseteq', 'sqsubset', 'sqsubseteq', 'preceq', 'supset', 'supseteq', 'nsupseteq', 'sqsupset', 'sqsupseteq', 'succeq']
 };
 
 /***/ },
@@ -409,26 +413,21 @@ var _mathjaxEditor = __webpack_require__(5);
 
 var _mathjaxEditor2 = _interopRequireDefault(_mathjaxEditor);
 
+var _Keys = __webpack_require__(11);
+
+var _Keys2 = _interopRequireDefault(_Keys);
+
 var _utils = __webpack_require__(0);
 
-var _utils2 = __webpack_require__(13);
+var _utils2 = __webpack_require__(14);
 
-var _styles = __webpack_require__(12);
+var _styles = __webpack_require__(13);
 
 var _styles2 = _interopRequireDefault(_styles);
-
-var _keys = __webpack_require__(11);
-
-var _keys2 = _interopRequireDefault(_keys);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var keyRows = _keys2.default.keyRows,
-    keyColumns = _keys2.default.keyColumns,
-    getKey = _keys2.default.getKey,
-    keyList = _keys2.default.keyList;
 
 var keyboardWidth = 320;
 
@@ -457,13 +456,14 @@ var Core = function () {
     this.editor = editor;
     this.isMobile = viewportWidth < 640;
     this.isVisible = false;
+    this.pageIndex = 0;
     this.$container = $container;
     this.$keyboard = $keyboard;
     this.$editorContainer = editor.core.$container;
     this.$editorContainerParent = editor.core.$container.parentNode;
     this.$editorInput = editor.core.$input;
 
-    document.addEventListener('click', this.handleDocumentClick.bind(this));
+    document.addEventListener('mousedown', this.handleDocumentClick.bind(this));
 
     this.hideKeyboard();
   }
@@ -482,20 +482,25 @@ var Core = function () {
 
       var Element = MathJax.HTML.Element;
       var $keyboard = this.$keyboard,
-          editor = this.editor;
+          editor = this.editor,
+          pageIndex = this.pageIndex;
 
+
+      var keys = _Keys2.default.getPage(pageIndex);
+      var keyRows = _Keys2.default.getKeyColumns();
+      var keyColumns = _Keys2.default.getKeyColumns();
       var keyWidth = (keyboardWidth - 20) / keyColumns;
       var keyWidthPx = keyWidth + 'px';
 
       (0, _utils2.emptyElement)($keyboard);
       $keyboard.style.width = keyboardWidth + 'px';
 
-      keyList.forEach(function (rows, i) {
+      keys.forEach(function (rows, i) {
         var $row = Element('div', { className: 'mjk-keyRow' });
 
         rows.forEach(function (column, j) {
-          var key = getKey(i, j);
-          var listener = key.getClickListener();
+          var key = _Keys2.default.getKey(pageIndex, i, j);
+
           var $key = Element('button', {
             className: 'mjk-key',
             style: {
@@ -505,11 +510,19 @@ var Core = function () {
             }
           });
 
-          $key.innerHTML = key.getLabel();
-          $key.addEventListener('click', function () {
-            listener(editor);
-            _this.updateInputElement();
-          });
+          if (key.exists()) {
+            (function () {
+              var listener = key.getClickListener();
+
+              $key.innerHTML = key.getLabel();
+              $key.addEventListener('click', function () {
+                listener(editor, _this);
+                _this.updateInputElement();
+              });
+            })();
+          } else {
+            $key.setAttribute('disabled', 'disabled');
+          }
 
           $row.appendChild($key);
         });
@@ -677,15 +690,63 @@ var Core = function () {
 
       var $target = e.target;
 
+      if (e.button !== 0) {
+        return;
+      }
+
       if (this.isMobile && $target === $container) {
         return this.hideKeyboard();
       }
       if ((0, _utils2.findNode)($target, $editorContainer)) {
         return this.showKeyboard();
       }
-      if (!(0, _utils2.findNode)($target, $container)) {
+      if (!(0, _utils2.findNode)($target, $container) && !(0, _utils2.findClass)($target, 'mjk-key')) {
         return this.hideKeyboard();
       }
+    }
+
+    /**
+     * Go to next keys page.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'nextPage',
+    value: function nextPage() {
+      var length = _Keys2.default.getPagesLength();
+      var index = void 0;
+
+      if (this.pageIndex === length - 1) {
+        index = 0;
+      } else {
+        index = this.pageIndex + 1;
+      }
+
+      this.pageIndex = index;
+      this.render();
+    }
+
+    /**
+     * Go to previous key page.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'previousPage',
+    value: function previousPage() {
+      var length = _Keys2.default.getPagesLength();
+      var index = void 0;
+
+      if (this.pageIndex === 0) {
+        index = length - 1;
+      } else {
+        index = this.pageIndex - 1;
+      }
+
+      this.pageIndex = index;
+      this.render();
     }
   }]);
 
@@ -719,11 +780,18 @@ var _Tex = __webpack_require__(7);
 
 var _Tex2 = _interopRequireDefault(_Tex);
 
+var _constants = __webpack_require__(2);
+
+var _constants2 = _interopRequireDefault(_constants);
+
 var _utils = __webpack_require__(0);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var supOrSub = _constants2.default.supOrSub;
+
 
 var KEY_BACKSPACE = 8;
 var KEY_ENTER = 13;
@@ -766,13 +834,13 @@ var Editor = function () {
 
     var Element = MathJax.HTML.Element;
 
-    var $el = (0, _utils.mustFindElement)(el);
+    var $el = (0, _utils.mustFindElement)(el, 'textarea');
     var $container = Element('div', { className: 'mj-ed-container' });
     var $input = Element('input', { className: 'mj-ed-input' });
     var $display = Element('div', { className: 'mj-ed-display' }, ['\\({\\cursor}' + value + '\\)']);
     var $debug = Element('pre', { className: 'mj-ed-debug' }, ['|']);
 
-    $el.parentNode.replaceChild($container, $el);
+    $el.parentNode.insertBefore($container, $el.nextSibling);
     $container.appendChild($input);
     $container.appendChild($display);
     $container.appendChild($debug);
@@ -786,6 +854,7 @@ var Editor = function () {
     $display.style.opacity = 0;
     $display.style.overflowX = scroll ? 'scroll' : 'hidden';
     $debug.style.display = debug ? 'block' : 'none';
+    $el.style.display = 'none';
 
     MathJax.Hub.Queue(function () {
       return MathJax.Hub.Typeset($display);
@@ -801,6 +870,7 @@ var Editor = function () {
     this.$debug = $debug;
     this.$display = $display;
     this.$input = $input;
+    this.$el = $el;
     this.bus = new _EventBus2.default();
     this.cursorIndex = 0;
     this.lastCursorTimeout = null;
@@ -810,7 +880,6 @@ var Editor = function () {
     this.newLine = newLine;
     this.tex = new _Tex2.default(value, 0);
     this.value = value;
-    this.lastValue = value;
   }
 
   /**
@@ -833,22 +902,22 @@ var Editor = function () {
       var cursorIndex = this.cursorIndex,
           value = this.value;
 
-      var tex = this.tex;
+      var tex = new _Tex2.default(value, cursorIndex);
 
-      if (value !== this.lastValue) {
-        tex = new _Tex2.default(value, cursorIndex);
-        this.tex = tex;
-      }
+      this.tex = tex;
 
       if (this.debug) {
         this.$debug.innerHTML = (0, _utils.insertBetween)(value, cursorIndex, '|');
       }
 
+      // Update original textarea value.
+      this.$el.innerHTML = value;
+
       this.updateJaxElement(tex.displayTex, function () {
         setTimeout(function () {
           var placer = new _Placer2.default(_this2);
           placer.on('setCursor', function (index) {
-            _this2.debug && console.log('The cursor should be placed at ' + index + '.');
+            _this2.debug && console.info('The cursor should be placed at ' + index + '.');
             _this2.cursorIndex = index;
             _this2.update();
           });
@@ -962,7 +1031,6 @@ var Editor = function () {
   }, {
     key: 'setValue',
     value: function setValue(value) {
-      this.lastValue = this.value;
       this.value = value;
     }
 
@@ -981,6 +1049,12 @@ var Editor = function () {
       var _this5 = this;
 
       var $input = this.$input;
+      var number = _constants2.default.number,
+          variable = _constants2.default.variable,
+          charToCommand = _constants2.default.charToCommand,
+          operators = _constants2.default.operators,
+          escapedOperators = _constants2.default.escapedOperators;
+
 
       var inputValue = $input.value.trim();
       var which = e.keyCode;
@@ -992,48 +1066,35 @@ var Editor = function () {
       }
 
       if (!inputValue.length) {
-        return this.handleInput(which);
+        return this.handleKeyPress(which);
       }
 
-      var translate = {
-        '+': '+',
-        '-': '-',
-        '=': '=',
-        ',': ',',
-        '.': '.',
-        '*': '\\cdot ',
-        '/': '\\div '
-      };
-
-      var test = {
-        char: /[\d\w]/
-      };
-
       inputValue.split('').forEach(function (char) {
-        if (!char.match(test.char) && !translate[char]) {
-          return;
+        if (char.match(number) || char.match(variable)) {
+          return _this5.insert(char);
         }
 
-        if (translate[char]) {
-          char = translate[char];
+        if (charToCommand.hasOwnProperty(char)) {
+          return _this5.insertCommand(charToCommand[char]);
         }
 
-        _this5.handleInput(which, char);
+        if ((0, _utils.inArray)(char, operators.concat(escapedOperators))) {
+          return _this5.insertSymbol(char);
+        }
       });
     }
 
     /**
-     * Handles the user input.
+     * Handles the key press.
      * 
      * @param {Number} which - Which key was pressed.
-     * @param {String} char - The character that was typed.
      * 
      * @return {Void}
      */
 
   }, {
-    key: 'handleInput',
-    value: function handleInput(which, char) {
+    key: 'handleKeyPress',
+    value: function handleKeyPress(which) {
       switch (which) {
         case KEY_LEFT:
           this.moveCursorLeft();
@@ -1061,12 +1122,6 @@ var Editor = function () {
       if (which && this.debug) {
         console.warn('The key ' + which + ' was pressed.');
       }
-
-      if (!char) {
-        return;
-      }
-
-      this.insert(char);
     }
 
     /**
@@ -1164,9 +1219,59 @@ var Editor = function () {
 
 
       this.cursorIndex += chars.length;
-
       this.setValue((0, _utils.insertBetween)(value, cursorIndex, chars));
       this.update();
+    }
+
+    /**
+     * Insert a character at cursor position.
+     * Allowed characters: 0-9 (numbers), a-z (variables).
+     * 
+     * @param {String} insert
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'insertChar',
+    value: function insertChar(char) {
+      var number = _constants2.default.number,
+          variable = _constants2.default.variable;
+
+
+      if (char.length !== 1) {
+        throw new RangeError('Only one char can be inserted through this method.');
+      }
+      if (!char.match(number) && !char.match(variable)) {
+        throw new RangeError('Only numbers and variables are allowed in insert, not "' + char + '".');
+      }
+
+      this.insert(char);
+    }
+
+    /**
+     * Insert a symbol at cursor position.
+     * 
+     * @param {String} symbol
+     */
+
+  }, {
+    key: 'insertSymbol',
+    value: function insertSymbol(symbol) {
+      var operators = _constants2.default.operators,
+          escapedOperators = _constants2.default.escapedOperators;
+
+      var symbols = operators.slice().concat(escapedOperators);
+
+      if (!(0, _utils.inArray)(symbol, symbols)) {
+        throw new RangeError('"' + symbol + '" is not a valid symbol.');
+      }
+
+      if ((0, _utils.inArray)(symbol, escapedOperators)) {
+        symbol = '\\' + symbol;
+      }
+
+      this.insert(symbol);
     }
 
     /**
@@ -1187,11 +1292,9 @@ var Editor = function () {
       var blockCount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
       var brackets = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
-      var dontNeedBackslash = ['^', '_'];
-
       this.focus();
 
-      if (command[0] !== '\\' && !(0, _utils.isAny)(command, dontNeedBackslash)) {
+      if (command[0] !== '\\' && !(0, _utils.inArray)(command, supOrSub)) {
         command = '\\' + command;
       }
 
@@ -1299,6 +1402,11 @@ var Editor = function () {
                 deletionEnd = props.end + 1;
                 break;
               }
+
+              if (!props.blocks) {
+                continue;
+              }
+
               // If is erasing one of block opening/closing.
               var _iteratorNormalCompletion2 = true;
               var _didIteratorError2 = false;
@@ -1419,12 +1527,6 @@ var _extendMathJax = __webpack_require__(8);
 
 var _extendMathJax2 = _interopRequireDefault(_extendMathJax);
 
-var _utils = __webpack_require__(0);
-
-var _constants = __webpack_require__(2);
-
-var _constants2 = _interopRequireDefault(_constants);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1449,7 +1551,7 @@ var MathJaxEditor = function () {
     var core = new _Editor2.default(options);
 
     this.core = core;
-    this.version = '1.2.8';
+    this.version = '1.2.13';
   }
 
   /**
@@ -1508,15 +1610,6 @@ var MathJaxEditor = function () {
   }, {
     key: 'insert',
     value: function insert(char) {
-      var number = _constants2.default.number,
-          variable = _constants2.default.variable;
-
-      if (char.length !== 1) {
-        throw new RangeError('Only one char can be inserted through this method.');
-      }
-      if (!char.match(number) && !char.match(variable)) {
-        throw new RangeError('Only numbers and variables are allowed in insert, not "' + char + '".');
-      }
       this.core.insert(char);
     }
 
@@ -1529,20 +1622,7 @@ var MathJaxEditor = function () {
   }, {
     key: 'insertSymbol',
     value: function insertSymbol(symbol) {
-      var operators = _constants2.default.operators,
-          escapedOperators = _constants2.default.escapedOperators;
-
-      var symbols = operators.slice().concat(escapedOperators);
-
-      if (!(0, _utils.inArray)(symbol, symbols)) {
-        throw new RangeError('"' + symbol + '" is not a valid symbol.');
-      }
-
-      if ((0, _utils.inArray)(symbol, escapedOperators)) {
-        symbol = '\\' + symbol;
-      }
-
-      this.core.insert(symbol);
+      this.core.insertSymbol(symbol);
     }
 
     /**
@@ -1739,7 +1819,7 @@ var Placer = function () {
         if (interval.startX <= x && x < interval.endX && proceedSearch) {
           if (interval.startY <= y && y < interval.endY) {
             found = true;
-            index = _this.placeAtInterval(interval, i, x, y);
+            index = _this.placeAtInterval(interval, i, x);
             if (interval.box) {
               proceedSearch = false;
             }
@@ -1824,8 +1904,7 @@ var Placer = function () {
     key: 'addInterval',
     value: function addInterval(data) {
       if (Number.isNaN(data.index)) {
-        console.log(this.elements);
-        console.error('This interval has NaN as index.');
+        console.error('An interval has NaN as index.');
       }
       this.intervals.push(data);
     }
@@ -1882,16 +1961,15 @@ var Placer = function () {
      * based on given `x`, and `y`.
      * 
      * @param {Object} interval
-     * @param {Number} x
-     * @param {Number} y
      * @param {Number} i - Index of the given interval inside `this.intervals`.
+     * @param {Number} x
      * 
      * @return {Number}
      */
 
   }, {
     key: 'placeAtInterval',
-    value: function placeAtInterval(interval, i, x, y) {
+    value: function placeAtInterval(interval, i, x) {
       var intervals = this.intervals;
       var width = interval.endX - interval.startX;
       var nextInterval = i + 1;
@@ -1990,7 +2068,6 @@ var Placer = function () {
      * 
      * @param {Object} data
      * @param {String} data.type
-     * @param {Number} data.index
      * @param {Object} data.props
      * 
      * @return {Void}
@@ -2002,7 +2079,6 @@ var Placer = function () {
       var _this3 = this;
 
       var type = _ref2.type,
-          index = _ref2.index,
           props = _ref2.props;
 
       var key = this.getNextKeyFor(type);
@@ -2016,41 +2092,47 @@ var Placer = function () {
 
       switch (type) {
         case 'frac':
-          var $numerator = $el.querySelector('.mjx-numerator');
-          var $denominator = $el.querySelector('.mjx-denominator');
-          var numBounding = $numerator.getBoundingClientRect();
-          var denBounding = $denominator.getBoundingClientRect();
-          var boundings = [numBounding, denBounding];
+          {
+            var $numerator = $el.querySelector('.mjx-numerator');
+            var $denominator = $el.querySelector('.mjx-denominator');
+            var numBounding = $numerator.getBoundingClientRect();
+            var denBounding = $denominator.getBoundingClientRect();
+            var boundings = [numBounding, denBounding];
 
-          boundings.forEach(function (bounding, i) {
-            if (blocks[i].length === 1) {
-              _this3.addIntervalBox(blocks[i].closeIndex, bounding);
-            }
-          });
+            boundings.forEach(function (bounding, i) {
+              if (blocks[i].length === 1) {
+                _this3.addIntervalBox(blocks[i].closeIndex, bounding);
+              }
+            });
 
-          break;
+            break;
+          }
 
         case 'root':
         case 'sqrt':
-          if (brackets && brackets.closeIndex - brackets.openIndex === 1) {
-            var $root = $el.querySelector('.mjx-root .mjx-char');
-            var bounding = $root.getBoundingClientRect();
-            this.addIntervalBox(brackets.closeIndex, bounding);
+          {
+            if (brackets && brackets.closeIndex - brackets.openIndex === 1) {
+              var $root = $el.querySelector('.mjx-root .mjx-char');
+              var bounding = $root.getBoundingClientRect();
+              this.addIntervalBox(brackets.closeIndex, bounding);
+            }
+            if (blocks[0].length === 1) {
+              var $box = $el.querySelector('.mjx-box');
+              var _bounding = $box.getBoundingClientRect();
+              this.addIntervalBox(blocks[0].closeIndex, _bounding);
+            }
+            break;
           }
-          if (blocks[0].length === 1) {
-            var $box = $el.querySelector('.mjx-box');
-            var _bounding = $box.getBoundingClientRect();
-            this.addIntervalBox(blocks[0].closeIndex, _bounding);
-          }
-          break;
 
         case 'subsup':
-          if (blocks[0].length === 1) {
-            var $target = $el.querySelector('.mjx-' + subType);
-            var _bounding2 = $target.getBoundingClientRect();
-            this.addIntervalBox(blocks[0].closeIndex, _bounding2);
+          {
+            if (blocks[0].length === 1) {
+              var $target = $el.querySelector('.mjx-' + subType);
+              var _bounding2 = $target.getBoundingClientRect();
+              this.addIntervalBox(blocks[0].closeIndex, _bounding2);
+            }
+            break;
           }
-          break;
       }
     }
 
@@ -2127,7 +2209,7 @@ var Placer = function () {
         var interval = intervals[i];
         if (interval.is === 'eol') {
           start = interval.index + 2;
-          intervalKey = key;
+          intervalKey = i;
           break;
         }
       }
@@ -2201,9 +2283,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var nearClosureHaystack = _constants2.default.nearClosureHaystack,
+    supOrSub = _constants2.default.supOrSub,
     cursorTex = _constants2.default.cursorTex,
     emptyTex = _constants2.default.emptyTex,
-    escType = _constants2.default.escType;
+    escType = _constants2.default.escType,
+    spacingTex = _constants2.default.spacingTex,
+    relationCommands = _constants2.default.relationCommands;
 
 
 var test = {
@@ -2235,7 +2320,7 @@ var Tex = function () {
     this.length = tex.length;
     this.displayTex = '';
     this.cursorIndex = cursorIndex;
-    this.isPartOfCommand = [];
+    this.isPartOfCommand = {};
 
     this.parse();
   }
@@ -2271,7 +2356,6 @@ var Tex = function () {
       var cursorPoints = [];
       var tex = this.tex;
       var length = this.tex.length;
-      var cursorIndex = this.cursorIndex;
       var i = 0;
 
       this.cursorPlaced = false;
@@ -2282,9 +2366,9 @@ var Tex = function () {
         var char = tex[index];
         var nextChar = tex[nextIndex];
         var lastChar = tex[index - 1];
-        var nearClosure = (0, _utils.isAny)(nextChar, nearClosureHaystack);
+        var nearClosure = (0, _utils.inArray)(nextChar, nearClosureHaystack);
         var isComma = char === ',';
-        var isGrOrLeSign = (0, _utils.isAny)(char, ['<', '>']);
+        var isGrOrLeSign = (0, _utils.inArray)(char, ['<', '>']);
         var isNumber = test.isNumber.exec(char);
         var isVariable = test.isVariable.exec(char);
         var isOperator = test.isOperator.exec(char);
@@ -2293,13 +2377,15 @@ var Tex = function () {
 
         this.addCursorToTexDisplay(index);
 
-        if (shouldBeAroundBraces) {
+        if (shouldBeAroundBraces || this.isRelationCommand(index)) {
           this.displayTex += '{';
         }
 
         // Closing a command block, add spacing.
         if (char === '}' && lastChar !== '\\') {
-          this.displayTex += '\\;';
+          if (!this.isPartOfCommandThatStartsWith(index, supOrSub)) {
+            this.displayTex += spacingTex;
+          }
         }
 
         // Add char to tex that are displayed on editor.
@@ -2330,7 +2416,7 @@ var Tex = function () {
         }
 
         // Check if character is an operator.
-        if (isOperator && !(0, _utils.inArray)(index, this.isPartOfCommand)) {
+        if (isOperator && !this.isPartOfCommand.hasOwnProperty(index)) {
           this.elements.push({
             is: 'operator',
             type: 'mo',
@@ -2345,7 +2431,11 @@ var Tex = function () {
             is: 'operator',
             type: type,
             index: index,
-            nearClosure: nearClosure
+            nearClosure: nearClosure,
+            props: {
+              start: index,
+              end: nextIndex
+            }
           });
           this.displayTex += nextChar;
           i += 1;
@@ -2371,21 +2461,25 @@ var Tex = function () {
         }
 
         // Sup and sub commands.
-        if ((0, _utils.isAny)(char, ['^', '_'])) {
+        if ((0, _utils.inArray)(char, supOrSub)) {
           i = this.parseCommand(i);
         }
 
         // Opening a command block.
         if (char === '{') {
-          this.displayTex += '\\;';
           if (nextChar === '}') {
             this.addCursorToTexDisplay(nextIndex);
             this.displayTex += emptyTex;
+          } else {
+            if (!this.isPartOfCommandThatStartsWith(index, supOrSub)) {
+              this.displayTex += spacingTex;
+            }
           }
           continue;
         }
 
         if (char === ' ') {
+
           continue;
         }
 
@@ -2424,8 +2518,8 @@ var Tex = function () {
       var iterator = i;
       var tex = this.tex;
       var length = this.tex.length;
-      var cursorIndex = this.cursorIndex;
       var firstChar = tex[iterator];
+      var partOfCommandObject = { firstChar: firstChar };
       var opening = null; // the first place the cursor can be placed inside this command
       var blocks = [];
       var brackets = null;
@@ -2455,7 +2549,7 @@ var Tex = function () {
         var isVariable = test.isVariable.exec(char);
 
         if (opening === null) {
-          this.displayTex += !(0, _utils.isAny)(char, ['\\', '^', '_']) ? char : '';
+          this.displayTex += !(0, _utils.inArray)(char, ['\\', '^', '_']) ? char : '';
           if (isVariable) {
             type += char;
           }
@@ -2477,7 +2571,7 @@ var Tex = function () {
         // Closing brackets!
         if (char === ']') {
           brackets.closeIndex = i;
-          this.isPartOfCommand.push(i);
+          this.isPartOfCommand[i] = partOfCommandObject;
         }
 
         // Find a block being openned.
@@ -2485,12 +2579,15 @@ var Tex = function () {
           // If it is this command block...
           if (openBlocks === 0) {
             blocks.push({ openIndex: i });
+            this.isPartOfCommand[i] = partOfCommandObject;
           }
           openBlocks += 1;
           if (opening === null) {
             opening = i;
 
-            this.displayTex += '\\;';
+            if (!(0, _utils.inArray)(firstChar, supOrSub)) {
+              this.displayTex += spacingTex;
+            }
 
             // Place the cursor if it is there.
             this.addCursorToTexDisplay(nextIndex);
@@ -2509,16 +2606,21 @@ var Tex = function () {
             var key = blocks.length - 1;
             blocks[key].closeIndex = i;
             blocks[key].length = i - blocks[key].openIndex;
+            this.isPartOfCommand[i] = partOfCommandObject;
           }
         }
 
         if (opening === null && char === ' ') {
+          var shouldBeAroundBraces = (0, _utils.inArray)(type, relationCommands);
           type = this.decideType(type);
           is = type === 'mo' ? 'operator' : 'variable';
           end = i;
           opening = i;
-          if ((0, _utils.isAny)(nextChar, nearClosureHaystack)) {
+          if ((0, _utils.inArray)(nextChar, nearClosureHaystack)) {
             nearClosure = true;
+          }
+          if (shouldBeAroundBraces) {
+            this.displayTex += '}';
           }
           break;
         }
@@ -2613,6 +2715,65 @@ var Tex = function () {
 
       return list.hasOwnProperty(type) ? list[type] : 'mo';
     }
+
+    /**
+     * Check if the command where the character of the given index
+     * starts with any of characters inside haystack.
+     * 
+     * @param {Number} index
+     * @param {Array} haystack
+     * 
+     * @return {Boolean}
+     */
+
+  }, {
+    key: 'isPartOfCommandThatStartsWith',
+    value: function isPartOfCommandThatStartsWith(index, haystack) {
+      var data = this.isPartOfCommand[index];
+      if (!data) {
+        return false;
+      }
+      return (0, _utils.inArray)(data.firstChar, haystack);
+    }
+
+    /**
+     * Check if a relation command is ahead.
+     * (In the future can be extended to other commands).
+     * This to avoid MathJax from joining two elements into one, and
+     * so bugging the cursor placement.
+     * 
+     * @param {Number} index
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'isRelationCommand',
+    value: function isRelationCommand(index) {
+      var tex = this.tex;
+
+      var length = tex.length;
+
+      if (tex[index] !== '\\') {
+        return;
+      }
+
+      var i = index + 1;
+      var name = '';
+
+      for (; i < length; i++) {
+        var char = tex[i];
+
+        if (!test.isVariable.exec(char) && char !== ' ') {
+          return false;
+        } else if (char === ' ') {
+          return (0, _utils.inArray)(name, relationCommands);
+        }
+        name += char;
+      }
+
+      return false;
+    }
   }]);
 
   return Tex;
@@ -2651,7 +2812,7 @@ function extendMathJax() {
 
   MathJax.Hub.processSectionDelay = 0;
 
-  MathJax.Hub.Register.StartupHook("TeX Jax Ready", function () {
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function () {
     var defaults = {
       mathvariant: MML.INHERIT,
       mathsize: MML.INHERIT,
@@ -2688,11 +2849,11 @@ function extendMathJax() {
     });
 
     TEX.Parse.Augment({
-      Cursor: function Cursor(name) {
+      Cursor: function Cursor() {
         var $cursor = MML.mcursor('0');
         this.Push($cursor);
       },
-      IsEmpty: function IsEmpty(name) {
+      IsEmpty: function IsEmpty() {
         var $isEmpty = MML.misEmpty('?');
         this.Push($isEmpty);
       }
@@ -2712,14 +2873,9 @@ function extendMathJax() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _mjxCursor$MjxCur;
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 var animation = 'from, to { border-color: #000 }\n 50% { border-color: transparent }';
 
-exports.default = (_mjxCursor$MjxCur = {
+exports.default = {
   '.mjx-cursor': {
     '-webkit-animation': '1s mj-ed-blink step-end infinite',
     '-moz-animation': '1s mj-ed-blink step-end infinite',
@@ -2741,7 +2897,9 @@ exports.default = (_mjxCursor$MjxCur = {
   },
 
   '.mj-ed-display': {
-    'box-sizing': 'border-box'
+    'box-sizing': 'border-box',
+    'cursor': 'text',
+    'overflow-Y': 'overflow'
   },
 
   '.mj-ed-display *': {
@@ -2756,15 +2914,19 @@ exports.default = (_mjxCursor$MjxCur = {
     color: '#ccc'
   },
 
-  '@keyframes mj-ed-blink': animation
-}, _defineProperty(_mjxCursor$MjxCur, '@keyframes mj-ed-blink', animation), _defineProperty(_mjxCursor$MjxCur, '@-moz-keyframes mj-ed-blink', animation), _defineProperty(_mjxCursor$MjxCur, '@-webkit-keyframes mj-ed-blink', animation), _defineProperty(_mjxCursor$MjxCur, '@-ms-keyframes mj-ed-blink', animation), _defineProperty(_mjxCursor$MjxCur, '@-o-keyframes mj-ed-blink', animation), _mjxCursor$MjxCur);
+  '@keyframes mj-ed-blink': animation,
+  '@-moz-keyframes mj-ed-blink': animation,
+  '@-webkit-keyframes mj-ed-blink': animation,
+  '@-ms-keyframes mj-ed-blink': animation,
+  '@-o-keyframes mj-ed-blink': animation
+};
 
 /***/ },
 /* 10 */
 /***/ function(module, exports) {
 
 "use strict";
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -2775,32 +2937,57 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Key = function () {
+  /**
+   * Creates a key.
+   * 
+   * @param {Object} key
+   * 
+   * @constructor
+   */
   function Key(key) {
     _classCallCheck(this, Key);
 
     this.key = key;
   }
 
+  /**
+   * Get the label of the key.
+   * 
+   * @return {String}
+   */
+
+
   _createClass(Key, [{
-    key: 'getLabel',
+    key: "getLabel",
     value: function getLabel() {
-      if (!this.key) {
-        return '';
-      }
       if (this.key.label) {
-        return '\\(' + this.key.label + '\\)';
+        return "\\(" + this.key.label + "\\)";
       }
-      return '<i class="material-icons">' + this.key.$label + '</i>';
+      return "<i class=\"material-icons\">" + this.key.$label + "</i>";
     }
+
+    /**
+     * Get the click listener of the key.
+     * 
+     * @return {Function}
+     */
+
   }, {
-    key: 'getClickListener',
+    key: "getClickListener",
     value: function getClickListener() {
-      if (!this.key || !this.key.onClick) {
-        return function () {
-          return null;
-        };
-      }
       return this.key.onClick;
+    }
+
+    /**
+     * Check if the key is set.
+     * 
+     * @return {Boolean}
+     */
+
+  }, {
+    key: "exists",
+    value: function exists() {
+      return !!this.key;
     }
   }]);
 
@@ -2820,13 +3007,123 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _Key = __webpack_require__(10);
 
 var _Key2 = _interopRequireDefault(_Key);
 
+var _pages = __webpack_require__(12);
+
+var _pages2 = _interopRequireDefault(_pages);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var keys = [[{ label: '(', onClick: function onClick(editor) {
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var pages = _pages2.default.pages,
+    controlKeys = _pages2.default.controlKeys;
+
+
+var pagesLength = pages.length;
+var keyRows = pages[0].length + 1; // controlKeys are the last row, so plus 1.
+var keyColumns = pages[0][0].length;
+
+pages = pages.map(function (page) {
+  page.push(controlKeys);
+  return page;
+});
+
+var Keys = function () {
+  function Keys() {
+    _classCallCheck(this, Keys);
+  }
+
+  _createClass(Keys, null, [{
+    key: 'getPage',
+
+    /**
+     * Get a page.
+     * 
+     * @param {Number} index
+     * 
+     * @return {Array}
+     */
+    value: function getPage(index) {
+      return pages[index];
+    }
+
+    /**
+     * Get the number of pages.
+     * 
+     * @return {Number}
+     */
+
+  }, {
+    key: 'getPagesLength',
+    value: function getPagesLength() {
+      return pagesLength;
+    }
+
+    /**
+     * Get the number of key rows.
+     * 
+     * @return {Number}
+     */
+
+  }, {
+    key: 'getKeyRows',
+    value: function getKeyRows() {
+      return keyRows;
+    }
+
+    /**
+     * Get the number of key columns.
+     * 
+     * @return {Number}
+     */
+
+  }, {
+    key: 'getKeyColumns',
+    value: function getKeyColumns() {
+      return keyColumns;
+    }
+
+    /**
+     * Get a key.
+     * 
+     * @param {Number} pageIndex
+     * @param {Number} i
+     * @param {Number} j
+     * 
+     * @return {Key}
+     */
+
+  }, {
+    key: 'getKey',
+    value: function getKey(pageIndex, i, j) {
+      return new _Key2.default(pages[pageIndex][i][j]);
+    }
+  }]);
+
+  return Keys;
+}();
+
+exports.default = Keys;
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var pages = [
+// Page 0
+[[{ label: '(', onClick: function onClick(editor) {
     return editor.insertSymbol('(');
   } }, { label: ')', onClick: function onClick(editor) {
     return editor.insertSymbol(')');
@@ -2837,9 +3134,9 @@ var keys = [[{ label: '(', onClick: function onClick(editor) {
   } }, { label: ']', onClick: function onClick(editor) {
     return editor.insertSymbol(']');
   } }, { label: '\\sqrt{a}', onClick: function onClick(editor) {
-    return editor.insertCommand('\\sqrt', 1);
+    return editor.insertCommand('sqrt', 1);
   } }, { label: '\\sqrt[n]{a}', onClick: function onClick(editor) {
-    return editor.insertCommand('\\sqrt', 1, true);
+    return editor.insertCommand('sqrt', 1, true);
   } }, { label: '\\geq', onClick: function onClick(editor) {
     return editor.insertCommand('\\geq');
   } }], [{ label: 'x', onClick: function onClick(editor) {
@@ -2851,13 +3148,13 @@ var keys = [[{ label: '(', onClick: function onClick(editor) {
   } }, { label: '9', onClick: function onClick(editor) {
     return editor.insert('9');
   } }, { label: '\\frac{a}{b}', onClick: function onClick(editor) {
-    return editor.insertCommand('\\frac', 2);
+    return editor.insertCommand('frac', 2);
   } }, { label: 'a^n', onClick: function onClick(editor) {
     return editor.insertCommand('^', 1);
   } }, { label: 'a_n', onClick: function onClick(editor) {
     return editor.insertCommand('_', 1);
   } }, { label: '\\leq', onClick: function onClick(editor) {
-    return editor.insertCommand('\\leq');
+    return editor.insertCommand('leq');
   } }], [{ label: 'y', onClick: function onClick(editor) {
     return editor.insert('y');
   } }, { label: '4', onClick: function onClick(editor) {
@@ -2881,7 +3178,7 @@ var keys = [[{ label: '(', onClick: function onClick(editor) {
   } }, { label: '+', onClick: function onClick(editor) {
     return editor.insertSymbol('+');
   } }, { label: '\\div', onClick: function onClick(editor) {
-    return editor.insertCommand('\\div');
+    return editor.insertCommand('div');
   } }, { label: '<', onClick: function onClick(editor) {
     return editor.insertSymbol('<');
   } }], [null, { label: ',', onClick: function onClick(editor) {
@@ -2894,7 +3191,143 @@ var keys = [[{ label: '(', onClick: function onClick(editor) {
     return editor.insertSymbol('%');
   } }, { label: '=', onClick: function onClick(editor) {
     return editor.insertSymbol('=');
-  } }, null, null], [{ $label: '&#xE314;', onClick: function onClick(editor) {
+  } }, { label: '\\pm', onClick: function onClick(editor) {
+    return editor.insertCommand('pm');
+  } }]],
+// Page 1
+[[{ label: 'a', onClick: function onClick(editor) {
+    return editor.insert('a');
+  } }, { label: 'b', onClick: function onClick(editor) {
+    return editor.insert('b');
+  } }, { label: 'c', onClick: function onClick(editor) {
+    return editor.insert('c');
+  } }, { label: 'd', onClick: function onClick(editor) {
+    return editor.insert('d');
+  } }, { label: 'e', onClick: function onClick(editor) {
+    return editor.insert('e');
+  } }, { label: 'f', onClick: function onClick(editor) {
+    return editor.insert('f');
+  } }, { label: 'g', onClick: function onClick(editor) {
+    return editor.insert('g');
+  } }, { label: 'h', onClick: function onClick(editor) {
+    return editor.insert('h');
+  } }], [{ label: 'i', onClick: function onClick(editor) {
+    return editor.insert('i');
+  } }, { label: 'j', onClick: function onClick(editor) {
+    return editor.insert('j');
+  } }, { label: 'k', onClick: function onClick(editor) {
+    return editor.insert('k');
+  } }, { label: 'l', onClick: function onClick(editor) {
+    return editor.insert('l');
+  } }, { label: 'm', onClick: function onClick(editor) {
+    return editor.insert('m');
+  } }, { label: 'n', onClick: function onClick(editor) {
+    return editor.insert('n');
+  } }, { label: 'o', onClick: function onClick(editor) {
+    return editor.insert('o');
+  } }, { label: 'p', onClick: function onClick(editor) {
+    return editor.insert('p');
+  } }], [{ label: 'q', onClick: function onClick(editor) {
+    return editor.insert('q');
+  } }, { label: 'r', onClick: function onClick(editor) {
+    return editor.insert('r');
+  } }, { label: 's', onClick: function onClick(editor) {
+    return editor.insert('s');
+  } }, { label: 't', onClick: function onClick(editor) {
+    return editor.insert('t');
+  } }, { label: 'u', onClick: function onClick(editor) {
+    return editor.insert('u');
+  } }, { label: 'v', onClick: function onClick(editor) {
+    return editor.insert('v');
+  } }, { label: 'w', onClick: function onClick(editor) {
+    return editor.insert('w');
+  } }, { label: 'x', onClick: function onClick(editor) {
+    return editor.insert('x');
+  } }], [{ label: 'y', onClick: function onClick(editor) {
+    return editor.insert('y');
+  } }, { label: 'z', onClick: function onClick(editor) {
+    return editor.insert('z');
+  } }, null, null, null, null, null, null], [null, null, null, null, null, null, null, null]],
+// Page 2
+[[{ label: '\\alpha', onClick: function onClick(editor) {
+    return editor.insertCommand('alpha');
+  } }, { label: '\\beta', onClick: function onClick(editor) {
+    return editor.insertCommand('beta');
+  } }, { label: '\\gamma', onClick: function onClick(editor) {
+    return editor.insertCommand('gamma');
+  } }, { label: '\\Gamma', onClick: function onClick(editor) {
+    return editor.insertCommand('Gamma');
+  } }, { label: '\\delta', onClick: function onClick(editor) {
+    return editor.insertCommand('delta');
+  } }, { label: '\\Delta', onClick: function onClick(editor) {
+    return editor.insertCommand('Delta');
+  } }, { label: '\\epsilon', onClick: function onClick(editor) {
+    return editor.insertCommand('epsilon');
+  } }, { label: '\\varepsilon', onClick: function onClick(editor) {
+    return editor.insertCommand('varepsilon');
+  } }], [{ label: '\\zeta', onClick: function onClick(editor) {
+    return editor.insertCommand('zeta');
+  } }, { label: '\\eta', onClick: function onClick(editor) {
+    return editor.insertCommand('eta');
+  } }, { label: '\\theta', onClick: function onClick(editor) {
+    return editor.insertCommand('theta');
+  } }, { label: '\\vartheta', onClick: function onClick(editor) {
+    return editor.insertCommand('vartheta');
+  } }, { label: '\\iota', onClick: function onClick(editor) {
+    return editor.insertCommand('iota');
+  } }, { label: '\\kappa', onClick: function onClick(editor) {
+    return editor.insertCommand('kappa');
+  } }, { label: '\\lambda', onClick: function onClick(editor) {
+    return editor.insertCommand('lambda');
+  } }, { label: '\\mu', onClick: function onClick(editor) {
+    return editor.insertCommand('mu');
+  } }], [{ label: '\\nu', onClick: function onClick(editor) {
+    return editor.insertCommand('nu');
+  } }, { label: '\\xi', onClick: function onClick(editor) {
+    return editor.insertCommand('xi');
+  } }, { label: '\\Xi', onClick: function onClick(editor) {
+    return editor.insertCommand('Xi');
+  } }, { label: '\\pi', onClick: function onClick(editor) {
+    return editor.insertCommand('pi');
+  } }, { label: '\\Pi', onClick: function onClick(editor) {
+    return editor.insertCommand('Pi');
+  } }, { label: '\\rho', onClick: function onClick(editor) {
+    return editor.insertCommand('rho');
+  } }, { label: '\\varrho', onClick: function onClick(editor) {
+    return editor.insertCommand('varrho');
+  } }, { label: '\\sigma', onClick: function onClick(editor) {
+    return editor.insertCommand('sigma');
+  } }], [{ label: '\\Sigma', onClick: function onClick(editor) {
+    return editor.insertCommand('Sigma');
+  } }, { label: '\\tau', onClick: function onClick(editor) {
+    return editor.insertCommand('tau');
+  } }, { label: '\\upsilon', onClick: function onClick(editor) {
+    return editor.insertCommand('upsilon');
+  } }, { label: '\\Upsilon', onClick: function onClick(editor) {
+    return editor.insertCommand('Upsilon');
+  } }, { label: '\\phi', onClick: function onClick(editor) {
+    return editor.insertCommand('phi');
+  } }, { label: '\\varphi', onClick: function onClick(editor) {
+    return editor.insertCommand('varphi');
+  } }, { label: '\\Phi', onClick: function onClick(editor) {
+    return editor.insertCommand('Phi');
+  } }, { label: '\\chi', onClick: function onClick(editor) {
+    return editor.insertCommand('chi');
+  } }], [{ label: '\\psi', onClick: function onClick(editor) {
+    return editor.insertCommand('psi');
+  } }, { label: '\\Psi', onClick: function onClick(editor) {
+    return editor.insertCommand('Psi');
+  } }, { label: '\\omega', onClick: function onClick(editor) {
+    return editor.insertCommand('omega');
+  } }, { label: '\\Omega', onClick: function onClick(editor) {
+    return editor.insertCommand('Omega');
+  } }, null, null, null, null]]];
+
+var controlKeys = [{ $label: '&#xE5C4;', onClick: function onClick(editor, keyboard) {
+    return keyboard.previousPage();
+  } }, { $label: '&#xE5C8;', onClick: function onClick(editor, keyboard) {
+    return keyboard.nextPage();
+  } }, null, { $label: '&#xE314;', onClick: function onClick(editor) {
     return editor.moveCursorLeft();
   } }, // Left arrow (move cursor)
 { $label: '&#xE315;', onClick: function onClick(editor) {
@@ -2903,20 +3336,17 @@ var keys = [[{ label: '(', onClick: function onClick(editor) {
 { $label: '&#xE14A;', onClick: function onClick(editor) {
     return editor.erase();
   } }, // Backspace
-null, null, null, null, null]];
+{ $label: '&#xE5D9;', onClick: function onClick(editor) {
+    return editor.core.insert('\\\\');
+  } }, null];
 
 exports.default = {
-  keyList: keys,
-  keyRows: keys.length,
-  keyColumns: keys[0].length,
-
-  getKey: function getKey(i, j) {
-    return new _Key2.default(keys[i][j]);
-  }
+  pages: pages,
+  controlKeys: controlKeys
 };
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports) {
 
 "use strict";
@@ -2983,7 +3413,7 @@ function onLoad() {
 window.addEventListener('load', onLoad);
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports) {
 
 "use strict";
@@ -2995,6 +3425,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.applyStyles = applyStyles;
 exports.emptyElement = emptyElement;
 exports.findNode = findNode;
+exports.findClass = findClass;
 /**
  * Apply styles to an element.
  * 
@@ -3044,8 +3475,30 @@ function findNode($at, $el) {
   return false;
 }
 
+/**
+ * Find a class in a node.
+ * 
+ * @param {DOMElement} $el
+ * @param {String} className
+ * 
+ * @return {Boolean}
+ */
+function findClass($el, className) {
+  var $parent = $el;
+  while ($parent) {
+    if (!$parent) {
+      return false;
+    }
+    if ($parent.className && ~$parent.className.indexOf(className)) {
+      return true;
+    }
+    $parent = $parent.parentNode;
+  }
+  return false;
+}
+
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3075,7 +3528,7 @@ var MathJaxEditorKeyboard = function () {
     var core = new _Core2.default(options);
 
     this.editor = core.editor;
-    this.version = '1.0.1';
+    this.version = '1.1.0';
   }
 
   /**
