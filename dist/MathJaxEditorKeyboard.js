@@ -562,6 +562,7 @@ var Core = function () {
         $container.appendChild($editorContainer);
         (0, _utils.addClass)($editorContainer, 'mjk-input');
         (0, _utils.addClass)($keyboard, 'isMobile');
+        (0, _utils.removeClass)($keyboard, 'isDesktop');
 
         (0, _utils2.applyStyles)($keyboard, {
           paddingLeft: padding,
@@ -578,6 +579,7 @@ var Core = function () {
           top: top - $editorContainer.offsetHeight
         });
       } else {
+        (0, _utils.addClass)($keyboard, 'isDesktop');
         (0, _utils.removeClass)($keyboard, 'isMobile');
         this.appendEditorToItsOriginalParent();
       }
@@ -654,8 +656,10 @@ var Core = function () {
       if (this.isVisible) {
         return;
       }
+
       this.isVisible = true;
       this.$container.style.display = 'block';
+      this.editor.focus();
       this.render();
     }
 
@@ -3327,7 +3331,7 @@ var controlKeys = [{ $label: '&#xE5C4;', onClick: function onClick(editor, keybo
     return keyboard.previousPage();
   } }, { $label: '&#xE5C8;', onClick: function onClick(editor, keyboard) {
     return keyboard.nextPage();
-  } }, null, { $label: '&#xE314;', onClick: function onClick(editor) {
+  } }, null, null, { $label: '&#xE314;', onClick: function onClick(editor) {
     return editor.moveCursorLeft();
   } }, // Left arrow (move cursor)
 { $label: '&#xE315;', onClick: function onClick(editor) {
@@ -3338,7 +3342,7 @@ var controlKeys = [{ $label: '&#xE5C4;', onClick: function onClick(editor, keybo
   } }, // Backspace
 { $label: '&#xE5D9;', onClick: function onClick(editor) {
     return editor.core.insert('\\\\');
-  } }, null];
+  } }];
 
 exports.default = {
   pages: pages,
@@ -3364,11 +3368,12 @@ function onLoad() {
     },
 
     '.mjk-keyboard': {
-      'background-color': '#f1f1f1',
+      'background-color': '#fff',
       border: '1px solid #ccc',
       bottom: 0,
       left: 0,
-      'padding': '1em 0',
+      overflow: 'hidden',
+      padding: '0.5em 0',
       position: 'absolute',
       width: '320px'
     },
@@ -3378,11 +3383,21 @@ function onLoad() {
       'border-top': '1px solid #ccc'
     },
 
+    '.mjk-keyboard.isDesktop': {
+      'border-width': '2px'
+    },
+
     '.mjk-keyRow': {
       'align-items': 'center',
       display: 'flex',
       'justify-content': 'center',
       'overflow': 'hidden'
+    },
+
+    '.mjk-keyRow:last-child': {
+      'border-top': '2px solid #f1f1f1',
+      'margin-top': '0.5em',
+      'padding-top': '0.5em'
     },
 
     '.mjk-key': {
@@ -3394,6 +3409,10 @@ function onLoad() {
       float: 'left',
       'justify-content': 'center',
       'text-align': 'center'
+    },
+
+    '.mjk-key *': {
+      'outline': 'none'
     },
 
     '.mjk-input': {
