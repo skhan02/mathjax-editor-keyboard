@@ -10,11 +10,12 @@ function onLoad() {
     },
 
     '.mjk-keyboard': {  
-      'background-color': '#f1f1f1',
+      'background-color': '#fff',
       border: '1px solid #ccc',
       bottom: 0,
       left: 0,
-      'padding': '1em 0',
+      overflow: 'hidden',
+      padding: '0.5em 0',
       position: 'absolute',
       width: '320px'
     },
@@ -24,11 +25,21 @@ function onLoad() {
       'border-top': '1px solid #ccc'
     },
 
+    '.mjk-keyboard.isDesktop': {
+      'border-width': '2px'
+    },
+
     '.mjk-keyRow': {
       'align-items': 'center',    
       display: 'flex',
       'justify-content': 'center',
       'overflow': 'hidden'
+    },
+
+    '.mjk-keyRow:last-child': {
+      'border-top': '2px solid #f1f1f1',
+      'margin-top': '0.5em',
+      'padding-top': '0.5em'
     },
 
     '.mjk-key': {
@@ -40,6 +51,10 @@ function onLoad() {
       float: 'left',
       'justify-content': 'center',
       'text-align': 'center'
+    },
+
+    '.mjk-key *': {
+      'outline': 'none'
     },
 
     '.mjk-input': {
