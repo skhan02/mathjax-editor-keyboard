@@ -121,6 +121,7 @@ class Core {
       $container.appendChild($editorContainer);
       addClass($editorContainer, 'mjk-input');
       addClass($keyboard, 'isMobile');
+      removeClass($keyboard, 'isDesktop');
 
       applyStyles($keyboard, {
         paddingLeft: padding,
@@ -138,6 +139,7 @@ class Core {
       });
     }
     else {
+      addClass($keyboard, 'isDesktop');
       removeClass($keyboard, 'isMobile');
       this.appendEditorToItsOriginalParent();
     }
@@ -198,8 +200,10 @@ class Core {
     if (this.isVisible) {
       return;
     }
+
     this.isVisible = true;
     this.$container.style.display = 'block';
+    this.editor.focus();
     this.render();
   }
 
