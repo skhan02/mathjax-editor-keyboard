@@ -164,11 +164,11 @@ const controlKeys = [
   { $label: '&#xE5C4;', onClick: (editor, keyboard) => keyboard.previousPage() },
   { $label: '&#xE5C8;', onClick: (editor, keyboard) => keyboard.nextPage() },
   null,
+  null,
   { $label: '&#xE314;', onClick: editor => editor.moveCursorLeft() }, // Left arrow (move cursor)
   { $label: '&#xE315;', onClick: editor => editor.moveCursorRight() }, // Right arrow
   { $label: '&#xE14A;', onClick: editor => editor.erase() }, // Backspace
-  { $label: '&#xE5D9;', onClick: editor => editor.core.insert('\\\\') },
-  null,
+  { $label: '&#xE5D9;', onClick: editor => editor.core.insert('\\\\') }
 ];
 
 export default {
