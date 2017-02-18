@@ -87,10 +87,10 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-'use strict';
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -283,12 +283,12 @@ function listToCharacterRegex(list) {
   return new RegExp('^[' + chars + ']$');
 }
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-"use strict";
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -355,12 +355,12 @@ var EventBus = function () {
 
 exports.default = EventBus;
 
-/***/ },
+/***/ }),
 /* 2 */
-/***/ function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-'use strict';
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -396,12 +396,12 @@ exports.default = {
   relationCommands: ['geq', 'leq', 'll', 'gg', 'doteq', 'equiv', 'approx', 'cong', 'simeq', 'sim', 'propto', 'neq', 'subset', 'subseteq', 'nsubseteq', 'sqsubset', 'sqsubseteq', 'preceq', 'supset', 'supseteq', 'nsupseteq', 'sqsupset', 'sqsupseteq', 'succeq']
 };
 
-/***/ },
+/***/ }),
 /* 3 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-'use strict';
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -511,15 +511,13 @@ var Core = function () {
           });
 
           if (key.exists()) {
-            (function () {
-              var listener = key.getClickListener();
+            var listener = key.getClickListener();
 
-              $key.innerHTML = key.getLabel();
-              $key.addEventListener('click', function () {
-                listener(editor, _this);
-                _this.updateInputElement();
-              });
-            })();
+            $key.innerHTML = key.getLabel();
+            $key.addEventListener('click', function () {
+              listener(editor, _this);
+              _this.updateInputElement();
+            });
           } else {
             $key.setAttribute('disabled', 'disabled');
           }
@@ -759,12 +757,12 @@ var Core = function () {
 
 exports.default = Core;
 
-/***/ },
+/***/ }),
 /* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-'use strict';
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -1035,6 +1033,7 @@ var Editor = function () {
   }, {
     key: 'setValue',
     value: function setValue(value) {
+      this.bus.trigger('change');
       this.value = value;
     }
 
@@ -1514,12 +1513,12 @@ var Editor = function () {
 
 exports.default = Editor;
 
-/***/ },
+/***/ }),
 /* 5 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-'use strict';
+
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -1555,7 +1554,7 @@ var MathJaxEditor = function () {
     var core = new _Editor2.default(options);
 
     this.core = core;
-    this.version = '1.2.13';
+    this.version = '1.2.14';
   }
 
   /**
@@ -1698,18 +1697,16 @@ var MathJaxEditor = function () {
 
 module.exports = MathJaxEditor;
 
-/***/ },
+/***/ }),
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-'use strict';
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -1834,31 +1831,25 @@ var Placer = function () {
       // Second strategy: find the nearest element to the clicked point.
 
       if (!found) {
-        var _ret = function () {
-          var last = { interval: null, distance: null, i: null };
+        var last = { interval: null, distance: null, i: null };
 
-          intervals.forEach(function (interval, i) {
-            if (!(interval.startY < y && y < interval.endY)) {
-              return;
-            }
-            var distance = Math.min(Math.abs(interval.startX - x), Math.abs(interval.endX - x));
-            if (last.distance === null || distance < last.distance) {
-              last.interval = interval;
-              last.distance = distance;
-              last.i = i;
-            }
-          });
-
-          if (!last.interval) {
-            return {
-              v: false
-            };
+        intervals.forEach(function (interval, i) {
+          if (!(interval.startY < y && y < interval.endY)) {
+            return;
           }
+          var distance = Math.min(Math.abs(interval.startX - x), Math.abs(interval.endX - x));
+          if (last.distance === null || distance < last.distance) {
+            last.interval = interval;
+            last.distance = distance;
+            last.i = i;
+          }
+        });
 
-          index = _this.placeAtInterval(last.interval, last.i, x, y);
-        }();
+        if (!last.interval) {
+          return false;
+        }
 
-        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+        index = this.placeAtInterval(last.interval, last.i, x, y);
       }
 
       this.bus.trigger('setCursor', index);
@@ -2015,6 +2006,10 @@ var Placer = function () {
 
           case 'eol':
             _this2.findEndOfLine(element);
+            break;
+
+          case 'begin':
+            _this2.findBegin(element);
             break;
 
           default:
@@ -2193,6 +2188,9 @@ var Placer = function () {
         box: true
       });
     }
+  }, {
+    key: 'findBegin',
+    value: function findBegin(element) {}
 
     /**
      * Find the last start of line index in the intervals list.
@@ -2263,12 +2261,12 @@ var Placer = function () {
 
 exports.default = Placer;
 
-/***/ },
+/***/ }),
 /* 7 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-'use strict';
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -2361,6 +2359,7 @@ var Tex = function () {
       var tex = this.tex;
       var length = this.tex.length;
       var i = 0;
+      var isInsideBegin = false;
 
       this.cursorPlaced = false;
 
@@ -2377,11 +2376,12 @@ var Tex = function () {
         var isVariable = test.isVariable.exec(char);
         var isOperator = test.isOperator.exec(char);
         var isNextCharEscapedOperator = test.isEscapedOperator.exec(nextChar);
+        var isRelationCommand = char === '\\' && this.isRelationCommand(index);
         var shouldBeAroundBraces = isComma || isNumber || isGrOrLeSign;
 
         this.addCursorToTexDisplay(index);
 
-        if (shouldBeAroundBraces || this.isRelationCommand(index)) {
+        if (shouldBeAroundBraces || isRelationCommand) {
           this.displayTex += '{';
         }
 
@@ -2446,7 +2446,7 @@ var Tex = function () {
         }
 
         // Newline up ahead.
-        if (char === '\\' && nextChar === '\\') {
+        if (char === '\\' && nextChar === '\\' && !isInsideBegin) {
           var newLine = { start: index, end: nextIndex };
           this.newLines[index] = newLine;
           this.newLines[nextIndex] = newLine;
@@ -2461,12 +2461,23 @@ var Tex = function () {
 
         // A command.
         if (char === '\\' && test.isVariable.exec(nextChar)) {
-          i = this.parseCommand(i);
+          var _parseCommand = this.parseCommand(i),
+              continueIterationAt = _parseCommand.continueIterationAt,
+              element = _parseCommand.element;
+
+          switch (element.is) {
+            case 'begin':
+              isInsideBegin = true;break;
+            case 'end':
+              isInsideBegin = false;break;
+          }
+
+          i = continueIterationAt;
         }
 
         // Sup and sub commands.
         if ((0, _utils.inArray)(char, supOrSub)) {
-          i = this.parseCommand(i);
+          i = this.parseCommand(i).continueIterationAt;
         }
 
         // Opening a command block.
@@ -2483,7 +2494,10 @@ var Tex = function () {
         }
 
         if (char === ' ') {
+          continue;
+        }
 
+        if (char === '&') {
           continue;
         }
 
@@ -2530,10 +2544,11 @@ var Tex = function () {
       var openBlocks = 0;
       var type = '';
       var subType = null;
-      var is = 'command'; // we assume it is a command but it can be operator or variable
+      var is = 'command'; // we assume it is a command but it can be operator, variable or begin
       var start = iterator; // index command starts
       var end = null; // index command ends
       var nearClosure = false;
+      var continueIterationAt = null;
 
       switch (firstChar) {
         case '^':
@@ -2551,6 +2566,7 @@ var Tex = function () {
         var nextIndex = i + 1;
         var nextChar = tex[nextIndex];
         var isVariable = test.isVariable.exec(char);
+        var blockContents = '';
 
         if (opening === null) {
           this.displayTex += !(0, _utils.inArray)(char, ['\\', '^', '_']) ? char : '';
@@ -2564,6 +2580,7 @@ var Tex = function () {
           brackets = { openIndex: i };
           if (opening === null) {
             opening = i;
+            continueIterationAt = opening;
           }
 
           // Add symbol of empty.
@@ -2585,9 +2602,11 @@ var Tex = function () {
             blocks.push({ openIndex: i });
             this.isPartOfCommand[i] = partOfCommandObject;
           }
-          openBlocks += 1;
+
+          // First block openning is there.
           if (opening === null) {
             opening = i;
+            continueIterationAt = opening;
 
             if (!(0, _utils.inArray)(firstChar, supOrSub)) {
               this.displayTex += spacingTex;
@@ -2599,19 +2618,25 @@ var Tex = function () {
             if (nextChar === '}') {
               this.displayTex += emptyTex;
             }
+          } else if (openBlocks > 0 && char !== '}') {
+            blockContents += char;
           }
+
+          openBlocks += 1;
         }
 
         // Find a block being closed.
         if (char === '}') {
-          openBlocks -= 1;
           // If it is this command block...
           if (openBlocks === 0) {
             var key = blocks.length - 1;
             blocks[key].closeIndex = i;
+            blocks[key].contents = blockContents;
             blocks[key].length = i - blocks[key].openIndex;
             this.isPartOfCommand[i] = partOfCommandObject;
           }
+
+          openBlocks -= 1;
         }
 
         if (opening === null && char === ' ') {
@@ -2620,6 +2645,7 @@ var Tex = function () {
           is = type === 'mo' ? 'operator' : 'variable';
           end = i;
           opening = i;
+          continueIterationAt = opening;
           if ((0, _utils.inArray)(nextChar, nearClosureHaystack)) {
             nearClosure = true;
           }
@@ -2643,7 +2669,24 @@ var Tex = function () {
         throw new SyntaxError('Looks like this TeX is invalid. Now have a hard time finding where, lul.');
       }
 
-      this.elements.push({
+      // Handle \begin and \end commands.
+      // We must skip its blocks contents.
+
+      if ((0, _utils.inArray)(type, ['begin', 'end'])) {
+        type = blocks[0].contents;
+        is = 'begin';
+        continueIterationAt = end;
+        if (type === 'end') {
+          return {
+            continueIterationAt: continueIterationAt,
+            element: {
+              is: 'end'
+            }
+          };
+        }
+      }
+
+      var element = {
         is: is,
         type: type,
         index: iterator,
@@ -2656,9 +2699,14 @@ var Tex = function () {
           blocks: blocks,
           brackets: brackets
         }
-      });
+      };
 
-      return opening;
+      this.elements.push(element);
+
+      return {
+        continueIterationAt: continueIterationAt,
+        element: element
+      };
     }
 
     /**
@@ -2785,12 +2833,12 @@ var Tex = function () {
 
 exports.default = Tex;
 
-/***/ },
+/***/ }),
 /* 8 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-'use strict';
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -2867,12 +2915,12 @@ function extendMathJax() {
   MathJax.Ajax.Styles(_styles2.default);
 }
 
-/***/ },
+/***/ }),
 /* 9 */
-/***/ function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-'use strict';
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -2925,12 +2973,12 @@ exports.default = {
   '@-o-keyframes mj-ed-blink': animation
 };
 
-/***/ },
+/***/ }),
 /* 10 */
-/***/ function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-"use strict";
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -3000,12 +3048,12 @@ var Key = function () {
 
 exports.default = Key;
 
-/***/ },
+/***/ }),
 /* 11 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-'use strict';
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -3115,12 +3163,12 @@ var Keys = function () {
 
 exports.default = Keys;
 
-/***/ },
+/***/ }),
 /* 12 */
-/***/ function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-'use strict';
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -3349,12 +3397,12 @@ exports.default = {
   controlKeys: controlKeys
 };
 
-/***/ },
+/***/ }),
 /* 13 */
-/***/ function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-'use strict';
+
 
 function onLoad() {
   var styles = {
@@ -3431,12 +3479,12 @@ function onLoad() {
 
 window.addEventListener('load', onLoad);
 
-/***/ },
+/***/ }),
 /* 14 */
-/***/ function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-'use strict';
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -3516,12 +3564,12 @@ function findClass($el, className) {
   return false;
 }
 
-/***/ },
+/***/ }),
 /* 15 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-'use strict';
+
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -3547,7 +3595,7 @@ var MathJaxEditorKeyboard = function () {
     var core = new _Core2.default(options);
 
     this.editor = core.editor;
-    this.version = '1.1.0';
+    this.version = '1.1.2';
   }
 
   /**
@@ -3569,6 +3617,6 @@ var MathJaxEditorKeyboard = function () {
 
 module.exports = MathJaxEditorKeyboard;
 
-/***/ }
+/***/ })
 /******/ ]);
 });
