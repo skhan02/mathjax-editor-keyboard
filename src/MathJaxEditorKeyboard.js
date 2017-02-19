@@ -23,6 +23,27 @@ class MathJaxEditorKeyboard {
   getValue() {
     return this.editor.getValue();
   }
+
+  /**
+   * Set editor's value.
+   * 
+   * @return {String}
+   */
+  setValue(value) {
+    return this.editor.setValue(value);
+  }
+
+  /**
+   * Listen to an editor event.
+   * 
+   * @param {String} type
+   * @param {Function} listener
+   * 
+   * @return {Void}
+   */
+  on(type, listener) {
+    this.editor.on(type, listener);
+  }
 }
 
 module.exports = MathJaxEditorKeyboard;
