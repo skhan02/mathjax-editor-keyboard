@@ -51,7 +51,6 @@ class Core {
     const { $keyboard, editor, pageIndex } = this;
 
     const keys = Keys.getPage(pageIndex);
-    const keyRows = Keys.getKeyColumns();
     const keyColumns = Keys.getKeyColumns();
     const keyWidth = (keyboardWidth - 20) / keyColumns;
     const keyWidthPx = `${keyWidth}px`;
@@ -108,8 +107,7 @@ class Core {
       $keyboard,
       $container,
       $editorContainer,
-      $editorInput,
-      $editorContainerParent
+      $editorInput
     } = this;
     const viewportWidth = window.innerWidth;
     const { top } = $keyboard.getBoundingClientRect();
@@ -163,7 +161,6 @@ class Core {
    */
   updateContainerElement() {
     const { $keyboard, $container, $editorContainer } = this;
-    const viewportWidth = window.innerWidth;
     let height, left, top, width;
 
     if (this.isMobile) {
