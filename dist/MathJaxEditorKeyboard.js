@@ -487,7 +487,6 @@ var Core = function () {
 
 
       var keys = _Keys2.default.getPage(pageIndex);
-      var keyRows = _Keys2.default.getKeyColumns();
       var keyColumns = _Keys2.default.getKeyColumns();
       var keyWidth = (keyboardWidth - 20) / keyColumns;
       var keyWidthPx = keyWidth + 'px';
@@ -545,8 +544,7 @@ var Core = function () {
       var $keyboard = this.$keyboard,
           $container = this.$container,
           $editorContainer = this.$editorContainer,
-          $editorInput = this.$editorInput,
-          $editorContainerParent = this.$editorContainerParent;
+          $editorInput = this.$editorInput;
 
       var viewportWidth = window.innerWidth;
 
@@ -612,7 +610,6 @@ var Core = function () {
           $container = this.$container,
           $editorContainer = this.$editorContainer;
 
-      var viewportWidth = window.innerWidth;
       var height = void 0,
           left = void 0,
           top = void 0,
@@ -1530,6 +1527,8 @@ var _extendMathJax = __webpack_require__(8);
 
 var _extendMathJax2 = _interopRequireDefault(_extendMathJax);
 
+var _utils = __webpack_require__(0);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1554,7 +1553,7 @@ var MathJaxEditor = function () {
     var core = new _Editor2.default(options);
 
     this.core = core;
-    this.version = '1.2.14';
+    this.version = '1.3.0';
   }
 
   /**
@@ -1641,6 +1640,19 @@ var MathJaxEditor = function () {
     }
 
     /**
+     * Set editor's value.
+     * 
+     * @return {String}
+     */
+
+  }, {
+    key: 'setValue',
+    value: function setValue(value) {
+      this.core.setValue(value);
+      this.core.update();
+    }
+
+    /**
      * Move the cursor to the left.
      * 
      * @return {Void}
@@ -1662,6 +1674,32 @@ var MathJaxEditor = function () {
     key: 'moveCursorRight',
     value: function moveCursorRight() {
       this.core.moveCursorRight();
+    }
+
+    /**
+     * Insert a matrix in the editor.
+     * 
+     * @param {Number} rows
+     * @param {Number} columns
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'insertMatrix',
+    value: function insertMatrix(rows, columns) {
+      var rowStr = (0, _utils.repeat)('&', rows - 1);
+      var length = columns - 1;
+      var matrix = '\\begin{bmatrix}' + rowStr;
+      var i = 0;
+
+      for (; i < length; i++) {
+        matrix += '\\\\' + rowStr;
+      }
+
+      matrix += '\\end{bmatrix}';
+
+      this.core.insert(matrix);
     }
 
     /**
@@ -2012,6 +2050,13 @@ var Placer = function () {
             _this2.findBegin(element);
             break;
 
+          case 'end':
+            break;
+
+          case 'skip':
+            _this2.skip(element);
+            break;
+
           default:
             _this2.find(element);
         }
@@ -2188,9 +2233,54 @@ var Placer = function () {
         box: true
       });
     }
+
+    /**
+     * Find a begin element.
+     * 
+     * @param {Object} element
+     */
+
   }, {
     key: 'findBegin',
-    value: function findBegin(element) {}
+    value: function findBegin(_ref4) {
+      var _this4 = this;
+
+      var type = _ref4.type,
+          props = _ref4.props;
+
+      var key = this.getNextKeyFor(type);
+      var $el = this.$display.querySelectorAll('.mjx-mtable')[key];
+      var $nodes = $el.querySelectorAll('.mjx-isEmpty');
+      var i = 0;
+
+      props.cells.forEach(function (cell) {
+        var diff = cell.end - cell.start;
+
+        if (diff !== 0 && diff !== 1) {
+          return;
+        }
+
+        var $target = $nodes[i++];
+        var bounding = $target.getBoundingClientRect();
+        _this4.addIntervalBox(cell.start, bounding);
+      });
+    }
+
+    /**
+     * Skip an element to be found.
+     * 
+     * @param {Object} element
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'skip',
+    value: function skip(_ref5) {
+      var type = _ref5.type;
+
+      this.getNextKeyFor(type);
+    }
 
     /**
      * Find the last start of line index in the intervals list.
@@ -2241,7 +2331,7 @@ var Placer = function () {
   }, {
     key: 'paintIntervals',
     value: function paintIntervals() {
-      var _this4 = this;
+      var _this5 = this;
 
       $paints.forEach(function ($paint) {
         return document.body.removeChild($paint);
@@ -2249,7 +2339,7 @@ var Placer = function () {
       $paints = [];
 
       this.intervals.forEach(function (interval) {
-        $paints.push(_this4.paint(interval));
+        $paints.push(_this5.paint(interval));
       });
 
       console.log(this.intervals);
@@ -2360,6 +2450,7 @@ var Tex = function () {
       var length = this.tex.length;
       var i = 0;
       var isInsideBegin = false;
+      var parsedBegin = null;
 
       this.cursorPlaced = false;
 
@@ -2446,17 +2537,24 @@ var Tex = function () {
         }
 
         // Newline up ahead.
-        if (char === '\\' && nextChar === '\\' && !isInsideBegin) {
-          var newLine = { start: index, end: nextIndex };
-          this.newLines[index] = newLine;
-          this.newLines[nextIndex] = newLine;
+        if (char === '\\' && nextChar === '\\') {
+          if (!isInsideBegin) {
+            var newLine = { start: index, end: nextIndex };
+            this.newLines[index] = newLine;
+            this.newLines[nextIndex] = newLine;
+            this.elements.push({
+              is: 'eol',
+              type: 'block',
+              index: index
+            });
+          }
+
           this.displayTex += '\\';
-          this.elements.push({
-            is: 'eol',
-            type: 'block',
-            index: index
-          });
           i += 1;
+
+          if (isInsideBegin && tex[i + 1] === '&') {
+            this.displayTex += emptyTex;
+          }
         }
 
         // A command.
@@ -2467,9 +2565,19 @@ var Tex = function () {
 
           switch (element.is) {
             case 'begin':
-              isInsideBegin = true;break;
+              isInsideBegin = true;
+              parsedBegin = element;
+
+              if (this.findAhead(element.props.end, '}&')) {
+                this.displayTex += emptyTex;
+              }
+              break;
+
             case 'end':
-              isInsideBegin = false;break;
+              isInsideBegin = false;
+              this.parseBegin(parsedBegin, element);
+              parsedBegin = null;
+              break;
           }
 
           i = continueIterationAt;
@@ -2485,10 +2593,8 @@ var Tex = function () {
           if (nextChar === '}') {
             this.addCursorToTexDisplay(nextIndex);
             this.displayTex += emptyTex;
-          } else {
-            if (!this.isPartOfCommandThatStartsWith(index, supOrSub)) {
-              this.displayTex += spacingTex;
-            }
+          } else if (!this.isPartOfCommandThatStartsWith(index, supOrSub) && !isInsideBegin) {
+            this.displayTex += spacingTex;
           }
           continue;
         }
@@ -2498,7 +2604,9 @@ var Tex = function () {
         }
 
         if (char === '&') {
-          continue;
+          if (this.findAhead(i + 1, '\\end') || nextChar === '&' || this.findAhead(i + 1, '\\\\')) {
+            this.displayTex += emptyTex;
+          }
         }
 
         cursorPoints.push(index);
@@ -2549,6 +2657,7 @@ var Tex = function () {
       var end = null; // index command ends
       var nearClosure = false;
       var continueIterationAt = null;
+      var blockContents = '';
 
       switch (firstChar) {
         case '^':
@@ -2566,7 +2675,6 @@ var Tex = function () {
         var nextIndex = i + 1;
         var nextChar = tex[nextIndex];
         var isVariable = test.isVariable.exec(char);
-        var blockContents = '';
 
         if (opening === null) {
           this.displayTex += !(0, _utils.inArray)(char, ['\\', '^', '_']) ? char : '';
@@ -2608,7 +2716,7 @@ var Tex = function () {
             opening = i;
             continueIterationAt = opening;
 
-            if (!(0, _utils.inArray)(firstChar, supOrSub)) {
+            if (!(0, _utils.inArray)(firstChar, supOrSub) && !(0, _utils.inArray)(type, ['begin', 'end'])) {
               this.displayTex += spacingTex;
             }
 
@@ -2618,25 +2726,26 @@ var Tex = function () {
             if (nextChar === '}') {
               this.displayTex += emptyTex;
             }
-          } else if (openBlocks > 0 && char !== '}') {
-            blockContents += char;
           }
 
           openBlocks += 1;
+        } else if (openBlocks > 0 && char !== '}') {
+          blockContents += char;
         }
 
         // Find a block being closed.
         if (char === '}') {
+          openBlocks -= 1;
+
           // If it is this command block...
           if (openBlocks === 0) {
             var key = blocks.length - 1;
             blocks[key].closeIndex = i;
             blocks[key].contents = blockContents;
             blocks[key].length = i - blocks[key].openIndex;
+            blockContents = '';
             this.isPartOfCommand[i] = partOfCommandObject;
           }
-
-          openBlocks -= 1;
         }
 
         if (opening === null && char === ' ') {
@@ -2673,9 +2782,11 @@ var Tex = function () {
       // We must skip its blocks contents.
 
       if ((0, _utils.inArray)(type, ['begin', 'end'])) {
+        is = type;
         type = blocks[0].contents;
-        is = 'begin';
         continueIterationAt = end;
+        this.displayTex += type + '}';
+
         if (type === 'end') {
           return {
             continueIterationAt: continueIterationAt,
@@ -2701,7 +2812,15 @@ var Tex = function () {
         }
       };
 
+      if (is === 'begin') {
+        this.elements.push({ is: 'skip', type: 'mo' });
+      }
+
       this.elements.push(element);
+
+      if (is === 'end') {
+        this.elements.push({ is: 'skip', type: 'mo' });
+      }
 
       return {
         continueIterationAt: continueIterationAt,
@@ -2825,6 +2944,76 @@ var Tex = function () {
       }
 
       return false;
+    }
+
+    /**
+     * Parse a begin command.
+     * 
+     * @param {Object} beginElement
+     * @param {Object} endElement
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'parseBegin',
+    value: function parseBegin(beginElement, endElement) {
+      var tex = this.tex;
+
+      var length = endElement.index + 1;
+      var cells = [];
+      var i = beginElement.props.end + 1;
+      var openBlocks = 0;
+      var start = i;
+      var end = null;
+
+      for (; i < length; i++) {
+        var char = tex[i];
+        var nextChar = tex[i + 1];
+        var isNewLine = char === '\\' && nextChar === '\\';
+        var isAtEnd = i === length - 1;
+
+        if (char === '{') {
+          openBlocks += 1;
+        }
+        if (char === '}') {
+          openBlocks -= 1;
+        }
+        if (openBlocks === 0 && (char === '&' || isNewLine || isAtEnd)) {
+          end = i + (isAtEnd ? 1 : 0);
+          cells.push({ start: start, end: end });
+          start = i + 1 + (isNewLine ? 1 : 0);
+        }
+      }
+
+      beginElement.props.cells = cells;
+    }
+
+    /**
+     * Find a string ahead an index pos.
+     * 
+     * @param {Number} index
+     * @param {String} str
+     * 
+     * @return {Boolean}
+     */
+
+  }, {
+    key: 'findAhead',
+    value: function findAhead(index, str) {
+      var tex = this.tex;
+
+      var strLength = str.length;
+      var length = index + strLength;
+      var i = index;
+
+      for (; i < length; i++) {
+        if (tex[i] !== str[i - index]) {
+          return false;
+        }
+      }
+
+      return true;
     }
   }]);
 
@@ -3408,8 +3597,10 @@ function onLoad() {
   var styles = {
     '.mjk-container': {
       'background-color': 'rgba(0, 0, 0, 0.5)',
+      'border-radius': '5px',
       height: '100%',
       left: 0,
+      overflow: 'hidden',
       position: 'absolute',
       top: 0,
       width: '100%'
@@ -3595,7 +3786,7 @@ var MathJaxEditorKeyboard = function () {
     var core = new _Core2.default(options);
 
     this.editor = core.editor;
-    this.version = '1.1.2';
+    this.version = '1.1.3';
   }
 
   /**
