@@ -2,8 +2,10 @@ function onLoad() {
   const styles = {
     '.mjk-container': {
       'background-color': 'rgba(0, 0, 0, 0.5)',
+      'border-radius': '5px',
       height: '100%',
       left: 0,
+      overflow: 'hidden',
       position: 'absolute',
       top: 0,
       width: '100%'
