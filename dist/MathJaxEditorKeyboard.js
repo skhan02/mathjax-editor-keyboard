@@ -3786,7 +3786,7 @@ var MathJaxEditorKeyboard = function () {
     var core = new _Core2.default(options);
 
     this.editor = core.editor;
-    this.version = '1.1.3';
+    this.version = '1.1.4';
   }
 
   /**
@@ -3800,6 +3800,33 @@ var MathJaxEditorKeyboard = function () {
     key: 'getValue',
     value: function getValue() {
       return this.editor.getValue();
+    }
+
+    /**
+     * Set editor's value.
+     * 
+     * @return {String}
+     */
+
+  }, {
+    key: 'setValue',
+    value: function setValue(value) {
+      return this.editor.setValue(value);
+    }
+
+    /**
+     * Listen to an editor event.
+     * 
+     * @param {String} type
+     * @param {Function} listener
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'on',
+    value: function on(type, listener) {
+      this.editor.on(type, listener);
     }
   }]);
 
