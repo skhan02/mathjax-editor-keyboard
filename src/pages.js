@@ -161,14 +161,14 @@ const pages = [
 ];
 
 const controlKeys = [
-  { $label: '&#xE5C4;', onClick: (editor, keyboard) => keyboard.previousPage() },
-  { $label: '&#xE5C8;', onClick: (editor, keyboard) => keyboard.nextPage() },
+  { $label: 'Left', onClick: (editor, keyboard) => keyboard.previousPage() },
+  { $label: 'Right', onClick: (editor, keyboard) => keyboard.nextPage() },
   null,
   null,
-  { $label: '&#xE314;', onClick: editor => editor.moveCursorLeft() }, // Left arrow (move cursor)
-  { $label: '&#xE315;', onClick: editor => editor.moveCursorRight() }, // Right arrow
-  { $label: '&#xE14A;', onClick: editor => editor.erase() }, // Backspace
-  { $label: '&#xE5D9;', onClick: editor => editor.core.insert('\\\\') }
+  { $label: 'PadLeft', onClick: editor => editor.moveCursorLeft() }, // Left arrow (move cursor)
+  { $label: 'PadRight', onClick: editor => editor.moveCursorRight() }, // Right arrow
+  { $label: 'Backspace', onClick: editor => editor.erase() }, // Backspace
+  { $label: 'Enter', onClick: editor => editor.core.insert('\\\\') }
 ];
 
 export default {

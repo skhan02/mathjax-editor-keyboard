@@ -19,7 +19,7 @@ class Key {
     if (this.key.label) {
       return `\\(${this.key.label}\\)`;
     }
-    return `<i class="material-icons">${this.key.$label}</i>`;
+    return `<i class="Mathjax_KeyboardIcon Mathjax_KeyboardIcon_${this.key.$label}"></i>`;
   }
 
   /**

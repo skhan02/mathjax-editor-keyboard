@@ -19,9 +19,11 @@ class Core {
 
     const $container = Element('div', { className: 'mjk-container' });
     const $keyboard = Element('div', { className: 'mjk-keyboard' });
+    const $arrow = Element('div', { className: 'mjk-arrow' });
     const viewportWidth = window.innerWidth;
 
     $container.appendChild($keyboard);
+    $container.appendChild($arrow);
     document.body.appendChild($container);
 
     const editor = new MathJaxEditor(options);
@@ -30,6 +32,7 @@ class Core {
     this.isMobile = (viewportWidth < 640);
     this.isVisible = false;
     this.pageIndex = 0;
+    this.$arrow = $arrow;
     this.$container = $container;
     this.$keyboard = $keyboard;
     this.$editorContainer = editor.core.$container;
@@ -104,6 +107,7 @@ class Core {
    */
   updateInputElement() {
     const {
+      $arrow,
       $keyboard,
       $container,
       $editorContainer,
@@ -135,10 +139,16 @@ class Core {
       applyStyles($editorContainer, {
         top: top - $editorContainer.offsetHeight
       });
+
+      applyStyles($arrow, {
+        display: 'none'
+      });
     }
     else {
       addClass($keyboard, 'isDesktop');
       removeClass($keyboard, 'isMobile');
+      applyStyles($arrow, { display: 'block' });
+
       this.appendEditorToItsOriginalParent();
     }
   }
@@ -160,7 +170,7 @@ class Core {
    * @return {Void}
    */
   updateContainerElement() {
-    const { $keyboard, $container, $editorContainer } = this;
+    const { $arrow, $keyboard, $container, $editorContainer } = this;
     let height, left, top, width;
 
     if (this.isMobile) {
@@ -178,6 +188,10 @@ class Core {
       left = leftPos;
       top = editorContainerBouncing.top + editorContainerBouncing.height + margin;
       width = keyboardBounding.width;
+
+      applyStyles($arrow, {
+        left: (width / 2) - 20
+      });
     }
 
     applyStyles($container, {
