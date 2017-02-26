@@ -92,196 +92,194 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.mustFindElement = mustFindElement;
-exports.insertBetween = insertBetween;
-exports.removeClass = removeClass;
-exports.addClass = addClass;
-exports.toArray = toArray;
-exports.inArray = inArray;
-exports.repeat = repeat;
-exports.removeFragment = removeFragment;
-exports.listToCharacterRegex = listToCharacterRegex;
-/**
- * Tries to find the specified element. If it fails, an error is thrown.
- * 
- * @param {DOMElement|string} el - An element or a selector.
- * 
- * @return {DOMElement}
- */
-function mustFindElement(el, tagName) {
-  var error = new Error('You must define a target element.');
+module.exports = {
+  /**
+   * Tries to find the specified element. If it fails, an error is thrown.
+   * 
+   * @param {DOMElement|string} el - An element or a selector.
+   * 
+   * @return {DOMElement}
+   */
+  mustFindElement: function mustFindElement(el, tagName) {
+    var error = new Error('You must define a target element.');
 
-  if (!el) {
-    throw error;
-  }
-
-  if (typeof el === 'string') {
-    el = document.querySelector(el);
     if (!el) {
       throw error;
     }
-  }
 
-  if (el.tagName.toLowerCase() !== tagName.toLowerCase()) {
-    throw new Error('The target element must be <' + tagName + '>.');
-  }
-
-  // Yeah, we just assume an element was given...
-  return el;
-}
-
-/**
- * Insert a text in the middle of the given string.
- * 
- * @param {String} string
- * @param {Number} index
- * @param {String} fragment
- * 
- * @return {String}
- */
-function insertBetween(string, index, fragment) {
-  var before = string.slice(0, index);
-  var after = string.slice(index);
-  return before + fragment + after;
-}
-
-/**
- * Remove a class of an element.
- * 
- * @param {DOMElement} $el
- * @param {String} className
- * 
- * @return {Void}
- */
-function removeClass($el, className) {
-  var classes = $el.className.split(' ');
-  var finalValue = '';
-
-  var _iteratorNormalCompletion = true;
-  var _didIteratorError = false;
-  var _iteratorError = undefined;
-
-  try {
-    for (var _iterator = classes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var c = _step.value;
-
-      if (c !== className) {
-        finalValue += ' ' + c;
+    if (typeof el === 'string') {
+      el = document.querySelector(el);
+      if (!el) {
+        throw error;
       }
     }
-  } catch (err) {
-    _didIteratorError = true;
-    _iteratorError = err;
-  } finally {
+
+    if (el.tagName.toLowerCase() !== tagName.toLowerCase()) {
+      throw new Error('The target element must be <' + tagName + '>.');
+    }
+
+    // Yeah, we just assume an element was given...
+    return el;
+  },
+
+
+  /**
+   * Insert a text in the middle of the given string.
+   * 
+   * @param {String} string
+   * @param {Number} index
+   * @param {String} fragment
+   * 
+   * @return {String}
+   */
+  insertBetween: function insertBetween(string, index, fragment) {
+    var before = string.slice(0, index);
+    var after = string.slice(index);
+    return before + fragment + after;
+  },
+
+
+  /**
+   * Remove a class of an element.
+   * 
+   * @param {DOMElement} $el
+   * @param {String} className
+   * 
+   * @return {Void}
+   */
+  removeClass: function removeClass($el, className) {
+    var classes = $el.className.split(' ');
+    var finalValue = '';
+
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
     try {
-      if (!_iteratorNormalCompletion && _iterator.return) {
-        _iterator.return();
+      for (var _iterator = classes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var c = _step.value;
+
+        if (c !== className) {
+          finalValue += ' ' + c;
+        }
       }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
     } finally {
-      if (_didIteratorError) {
-        throw _iteratorError;
+      try {
+        if (!_iteratorNormalCompletion && _iterator.return) {
+          _iterator.return();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
       }
     }
+
+    $el.className = finalValue.trim();
+  },
+
+
+  /**
+   * Add a class to an element.
+   * 
+   * @param {DOMElement} $el
+   * @param {String} className
+   * 
+   * @return {Void}
+   */
+  addClass: function addClass($el, className) {
+    var classes = $el.className.split(' ');
+    if (!~classes.indexOf(className)) {
+      $el.className += ' ' + className;
+    }
+    $el.className = $el.className.trim();
+  },
+
+
+  /**
+   * Converts a DOM node list to array.
+   * 
+   * @param {DOMNodeList}
+   * 
+   * @return {Array}
+   */
+  toArray: function toArray(children) {
+    var slice = [].slice;
+    return slice.call(children);
+  },
+
+
+  /**
+   * Check if the needle is found in haystack.
+   * 
+   * @param {Mixed} needle
+   * @param {Array} haystack
+   * 
+   * @return {Boolean}
+   */
+  inArray: function inArray(needle, haystack) {
+    return !!~haystack.indexOf(needle);
+  },
+
+
+  /**
+   * Repeat a string.
+   * 
+   * @param {String} str
+   * @param {Number} count
+   * 
+   * @return {String}
+   */
+  repeat: function repeat(str, count) {
+    var result = '';
+    var double = str + str;
+    var isOdd = count % 2 !== 0;
+    var length = Math.floor(count / 2);
+    var i = 0;
+    for (; i < length; i++) {
+      result += double;
+    }
+
+    if (isOdd) {
+      result += str;
+    }
+
+    return result;
+  },
+
+
+  /**
+   * Remove part of a string.
+   * 
+   * >> removeFragment("0123456", 1, 3);
+   * << "03456"
+   * 
+   * So, when start 1 and end 3, "0123456"
+   *                               ^^
+   *                             Removed
+   */
+  removeFragment: function removeFragment(str, start, end) {
+    return str.slice(0, start) + str.slice(end);
+  },
+
+
+  /**
+   * Convert a list to a character regex.
+   * 
+   * @param {Array} list
+   * 
+   * @return {RegExp}
+   */
+  listToCharacterRegex: function listToCharacterRegex(list) {
+    var chars = list.map(function (char) {
+      return '\\' + char;
+    }).join('');
+    return new RegExp('^[' + chars + ']$');
   }
-
-  $el.className = finalValue.trim();
-}
-
-/**
- * Add a class to an element.
- * 
- * @param {DOMElement} $el
- * @param {String} className
- * 
- * @return {Void}
- */
-function addClass($el, className) {
-  var classes = $el.className.split(' ');
-  if (!~classes.indexOf(className)) {
-    $el.className += ' ' + className;
-  }
-  $el.className = $el.className.trim();
-}
-
-/**
- * Converts a DOM node list to array.
- * 
- * @param {DOMNodeList}
- * 
- * @return {Array}
- */
-function toArray(children) {
-  var slice = [].slice;
-  return slice.call(children);
-}
-
-/**
- * Check if the needle is found in haystack.
- * 
- * @param {Mixed} needle
- * @param {Array} haystack
- * 
- * @return {Boolean}
- */
-function inArray(needle, haystack) {
-  return !!~haystack.indexOf(needle);
-}
-
-/**
- * Repeat a string.
- * 
- * @param {String} str
- * @param {Number} count
- * 
- * @return {String}
- */
-function repeat(str, count) {
-  var result = '';
-  var double = str + str;
-  var isOdd = count % 2 !== 0;
-  var length = Math.floor(count / 2);
-  var i = 0;
-  for (; i < length; i++) {
-    result += double;
-  }
-
-  if (isOdd) {
-    result += str;
-  }
-
-  return result;
-}
-
-/**
- * Remove part of a string.
- * 
- * >> removeFragment("0123456", 1, 3);
- * << "03456"
- * 
- * So, when start 1 and end 3, "0123456"
- *                               ^^
- *                             Removed
- */
-function removeFragment(str, start, end) {
-  return str.slice(0, start) + str.slice(end);
-}
-
-/**
- * Convert a list to a character regex.
- * 
- * @param {Array} list
- * 
- * @return {RegExp}
- */
-function listToCharacterRegex(list) {
-  var chars = list.map(function (char) {
-    return '\\' + char;
-  }).join('');
-  return new RegExp('^[' + chars + ']$');
-}
+};
 
 /***/ }),
 /* 1 */
@@ -289,10 +287,6 @@ function listToCharacterRegex(list) {
 
 "use strict";
 
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -353,7 +347,7 @@ var EventBus = function () {
   return EventBus;
 }();
 
-exports.default = EventBus;
+module.exports = EventBus;
 
 /***/ }),
 /* 2 */
@@ -362,10 +356,7 @@ exports.default = EventBus;
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = {
+module.exports = {
   cursorTex: '{\\cursor}',
 
   emptyTex: '\\isEmpty',
@@ -446,9 +437,11 @@ var Core = function () {
 
     var $container = Element('div', { className: 'mjk-container' });
     var $keyboard = Element('div', { className: 'mjk-keyboard' });
+    var $arrow = Element('div', { className: 'mjk-arrow' });
     var viewportWidth = window.innerWidth;
 
     $container.appendChild($keyboard);
+    $container.appendChild($arrow);
     document.body.appendChild($container);
 
     var editor = new _mathjaxEditor2.default(options);
@@ -457,6 +450,7 @@ var Core = function () {
     this.isMobile = viewportWidth < 640;
     this.isVisible = false;
     this.pageIndex = 0;
+    this.$arrow = $arrow;
     this.$container = $container;
     this.$keyboard = $keyboard;
     this.$editorContainer = editor.core.$container;
@@ -541,7 +535,8 @@ var Core = function () {
   }, {
     key: 'updateInputElement',
     value: function updateInputElement() {
-      var $keyboard = this.$keyboard,
+      var $arrow = this.$arrow,
+          $keyboard = this.$keyboard,
           $container = this.$container,
           $editorContainer = this.$editorContainer,
           $editorInput = this.$editorInput;
@@ -574,9 +569,15 @@ var Core = function () {
         (0, _utils2.applyStyles)($editorContainer, {
           top: top - $editorContainer.offsetHeight
         });
+
+        (0, _utils2.applyStyles)($arrow, {
+          display: 'none'
+        });
       } else {
         (0, _utils.addClass)($keyboard, 'isDesktop');
         (0, _utils.removeClass)($keyboard, 'isMobile');
+        (0, _utils2.applyStyles)($arrow, { display: 'block' });
+
         this.appendEditorToItsOriginalParent();
       }
     }
@@ -606,7 +607,8 @@ var Core = function () {
   }, {
     key: 'updateContainerElement',
     value: function updateContainerElement() {
-      var $keyboard = this.$keyboard,
+      var $arrow = this.$arrow,
+          $keyboard = this.$keyboard,
           $container = this.$container,
           $editorContainer = this.$editorContainer;
 
@@ -629,6 +631,10 @@ var Core = function () {
         left = leftPos;
         top = editorContainerBouncing.top + editorContainerBouncing.height + margin;
         width = keyboardBounding.width;
+
+        (0, _utils2.applyStyles)($arrow, {
+          left: width / 2 - 20
+        });
       }
 
       (0, _utils2.applyStyles)($container, {
@@ -761,35 +767,25 @@ exports.default = Core;
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _EventBus = __webpack_require__(1);
-
-var _EventBus2 = _interopRequireDefault(_EventBus);
-
-var _Placer = __webpack_require__(6);
-
-var _Placer2 = _interopRequireDefault(_Placer);
-
-var _Tex = __webpack_require__(7);
-
-var _Tex2 = _interopRequireDefault(_Tex);
-
-var _constants = __webpack_require__(2);
-
-var _constants2 = _interopRequireDefault(_constants);
-
-var _utils = __webpack_require__(0);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var supOrSub = _constants2.default.supOrSub;
+var EventBus = __webpack_require__(1);
+var Placer = __webpack_require__(6);
+var Tex = __webpack_require__(7);
+var constants = __webpack_require__(2);
+
+var _require = __webpack_require__(0),
+    addClass = _require.addClass,
+    insertBetween = _require.insertBetween,
+    inArray = _require.inArray,
+    mustFindElement = _require.mustFindElement,
+    removeClass = _require.removeClass,
+    removeFragment = _require.removeFragment,
+    repeat = _require.repeat;
+
+var supOrSub = constants.supOrSub;
 
 
 var KEY_BACKSPACE = 8;
@@ -833,21 +829,25 @@ var Editor = function () {
 
     var Element = MathJax.HTML.Element;
 
-    var $el = (0, _utils.mustFindElement)(el, 'textarea');
-    var $container = Element('div', { className: 'mj-ed-container' });
-    var $input = Element('input', { className: 'mj-ed-input' });
-    var $display = Element('div', { className: 'mj-ed-display' }, ['\\({\\cursor}' + value + '\\)']);
-    var $debug = Element('pre', { className: 'mj-ed-debug' }, ['|']);
+    var $el = mustFindElement(el, 'textarea');
+    var $container = Element('div', { className: 'Mathjax_Editor' });
+    var $input = Element('input', { className: 'Mathjax_EditorInput' });
+    var $display = Element('div', { className: 'Mathjax_EditorDisplay' }, ['\\({\\cursor}' + value + '\\)']);
+    var $debug = Element('pre', { className: 'Mathjax_EditorDebug' }, ['|']);
+    var $cursor = Element('div', { className: 'Mathjax_EditorCursor' });
 
     $el.parentNode.insertBefore($container, $el.nextSibling);
     $container.appendChild($input);
     $container.appendChild($display);
     $container.appendChild($debug);
+    $container.appendChild($cursor);
 
     $input.addEventListener('keydown', this.handleInputEvent.bind(this));
     $input.addEventListener('keyup', this.handleInputEvent.bind(this));
     $input.addEventListener('blur', this.blur.bind(this));
     $display.addEventListener('click', this.focus.bind(this));
+    $display.addEventListener('mouseenter', this.handleMouseEnter.bind(this));
+    $display.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
     document.body.addEventListener('click', this.handleBodyClick.bind(this));
 
     $display.style.opacity = 0;
@@ -866,19 +866,23 @@ var Editor = function () {
     });
 
     this.$container = $container;
+    this.$cursor = $cursor;
     this.$debug = $debug;
     this.$display = $display;
     this.$input = $input;
     this.$el = $el;
-    this.bus = new _EventBus2.default();
+    this.bus = new EventBus();
     this.cursorIndex = 0;
     this.lastCursorTimeout = null;
     this.placer = null;
     this.debug = debug;
     this.focusClass = focusClass;
     this.newLine = newLine;
-    this.tex = new _Tex2.default(value, 0);
+    this.tex = new Tex(value, 0);
     this.value = value;
+    this.mouseAtDisplay = false;
+    this.textAlignment = 'left';
+    this.getDisplayAlignment();
   }
 
   /**
@@ -901,20 +905,17 @@ var Editor = function () {
       var cursorIndex = this.cursorIndex,
           value = this.value;
 
-      var tex = new _Tex2.default(value, cursorIndex);
+      var tex = new Tex(value, cursorIndex);
 
       this.tex = tex;
 
       if (this.debug) {
-        this.$debug.innerHTML = (0, _utils.insertBetween)(value, cursorIndex, '|');
+        this.$debug.innerHTML = insertBetween(value, cursorIndex, '|');
       }
-
-      // Update original textarea value.
-      this.$el.innerHTML = value;
 
       this.updateJaxElement(tex.displayTex, function () {
         setTimeout(function () {
-          var placer = new _Placer2.default(_this2);
+          var placer = new Placer(_this2);
           placer.on('setCursor', function (index) {
             _this2.debug && console.info('The cursor should be placed at ' + index + '.');
             _this2.cursorIndex = index;
@@ -992,46 +993,86 @@ var Editor = function () {
       var _this4 = this;
 
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-      var $display = this.$display;
+      var $display = this.$display,
+          $cursor = this.$cursor;
 
       var hidden = options.cursorHidden || false;
       var className = 'wasRecentlyPlaced';
 
-      MathJax.Hub.Queue(function () {
-        var $cursor = $display.querySelector('.mjx-cursor');
+      $cursor.style.display = hidden ? 'none' : 'inline-block';
 
-        if (!$cursor) {
+      if (this.lastCursorTimeout) {
+        clearTimeout(this.lastCursorTimeout);
+      }
+
+      addClass($cursor, className);
+
+      this.lastCursorTimeout = setTimeout(function () {
+        return removeClass($cursor, className);
+      }, 400);
+
+      MathJax.Hub.Queue(function () {
+        var $mjxCursor = $display.querySelector('.mjx-cursor');
+
+        if (!$mjxCursor) {
           return;
         }
 
-        var offsetWidth = $cursor.offsetWidth,
-            offsetLeft = $cursor.offsetLeft;
+        var _$mjxCursor$getBoundi = $mjxCursor.getBoundingClientRect(),
+            left = _$mjxCursor$getBoundi.left,
+            right = _$mjxCursor$getBoundi.right,
+            top = _$mjxCursor$getBoundi.top,
+            bottom = _$mjxCursor$getBoundi.bottom;
 
+        var cursorLeft = left;
 
-        if (!$cursor.style.marginLeft) {
-          $cursor.style.marginLeft = '-' + offsetWidth + 'px';
+        switch (_this4.textAlignment) {
+          case 'center':
+            cursorLeft = left + (right - left) / 2;break;
+
+          case 'right':
+            cursorLeft = right;break;
         }
 
-        if (_this4.lastCursorTimeout) {
-          clearTimeout(_this4.lastCursorTimeout);
-        }
+        $cursor.style.left = cursorLeft + 'px';
+        $cursor.style.top = top + 'px';
+        $cursor.style.height = bottom - top + 'px';
+        $display.scrollLeft = left;
 
-        (0, _utils.addClass)($cursor, className);
-
-        _this4.lastCursorTimeout = setTimeout(function () {
-          return (0, _utils.removeClass)($cursor, className);
-        }, 600);
-
-        $display.scrollLeft = offsetLeft;
-
-        $cursor.style.display = hidden ? 'none' : 'inline-block';
+        $mjxCursor.parentNode.removeChild($mjxCursor);
       });
     }
+
+    /**
+     * Get the alignment put on the editor's display.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'getDisplayAlignment',
+    value: function getDisplayAlignment() {
+      var style = window.getComputedStyle(this.$display);
+      this.textAlignment = style.getPropertyValue('text-align') || 'left';
+    }
+
+    /**
+     * Set the editor's value.
+     * 
+     * @param {String} value
+     * 
+     * @return {Void}
+     */
+
   }, {
     key: 'setValue',
     value: function setValue(value) {
-      this.bus.trigger('change');
       this.value = value;
+
+      // Update original textarea value.
+      this.$el.innerHTML = value;
+
+      this.bus.trigger('change');
     }
 
     /**
@@ -1049,11 +1090,11 @@ var Editor = function () {
       var _this5 = this;
 
       var $input = this.$input;
-      var number = _constants2.default.number,
-          variable = _constants2.default.variable,
-          charToCommand = _constants2.default.charToCommand,
-          operators = _constants2.default.operators,
-          escapedOperators = _constants2.default.escapedOperators;
+      var number = constants.number,
+          variable = constants.variable,
+          charToCommand = constants.charToCommand,
+          operators = constants.operators,
+          escapedOperators = constants.escapedOperators;
 
 
       var inputValue = $input.value.trim();
@@ -1078,7 +1119,7 @@ var Editor = function () {
           return _this5.insertCommand(charToCommand[char]);
         }
 
-        if ((0, _utils.inArray)(char, operators.concat(escapedOperators))) {
+        if (inArray(char, operators.concat(escapedOperators))) {
           return _this5.insertSymbol(char);
         }
       });
@@ -1185,7 +1226,7 @@ var Editor = function () {
       this.$input.focus();
       this.updateCursorElement({ cursorHidden: false });
       this.bus.trigger('focus');
-      (0, _utils.addClass)(this.$display, this.focusClass);
+      addClass(this.$display, this.focusClass);
     }
 
     /**
@@ -1197,10 +1238,37 @@ var Editor = function () {
   }, {
     key: 'blur',
     value: function blur() {
+      if (this.mouseAtDisplay) {
+        return;
+      }
       this.$input.blur();
       this.updateCursorElement({ cursorHidden: true });
       this.bus.trigger('blur');
-      (0, _utils.removeClass)(this.$display, this.focusClass);
+      removeClass(this.$display, this.focusClass);
+    }
+
+    /**
+     * Triggered when user's mouse enters the display.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'handleMouseEnter',
+    value: function handleMouseEnter() {
+      this.mouseAtDisplay = true;
+    }
+
+    /**
+     * Triggered when user's mouse leaves the display.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'handleMouseLeave',
+    value: function handleMouseLeave() {
+      this.mouseAtDisplay = false;
     }
 
     /**
@@ -1219,7 +1287,7 @@ var Editor = function () {
 
 
       this.cursorIndex += chars.length;
-      this.setValue((0, _utils.insertBetween)(value, cursorIndex, chars));
+      this.setValue(insertBetween(value, cursorIndex, chars));
       this.update();
     }
 
@@ -1235,8 +1303,8 @@ var Editor = function () {
   }, {
     key: 'insertChar',
     value: function insertChar(char) {
-      var number = _constants2.default.number,
-          variable = _constants2.default.variable;
+      var number = constants.number,
+          variable = constants.variable;
 
 
       if (char.length !== 1) {
@@ -1258,16 +1326,16 @@ var Editor = function () {
   }, {
     key: 'insertSymbol',
     value: function insertSymbol(symbol) {
-      var operators = _constants2.default.operators,
-          escapedOperators = _constants2.default.escapedOperators;
+      var operators = constants.operators,
+          escapedOperators = constants.escapedOperators;
 
       var symbols = operators.slice().concat(escapedOperators);
 
-      if (!(0, _utils.inArray)(symbol, symbols)) {
+      if (!inArray(symbol, symbols)) {
         throw new RangeError('"' + symbol + '" is not a valid symbol.');
       }
 
-      if ((0, _utils.inArray)(symbol, escapedOperators)) {
+      if (inArray(symbol, escapedOperators)) {
         symbol = '\\' + symbol;
       }
 
@@ -1294,7 +1362,7 @@ var Editor = function () {
 
       this.focus();
 
-      if (command[0] !== '\\' && !(0, _utils.inArray)(command, supOrSub)) {
+      if (command[0] !== '\\' && !inArray(command, supOrSub)) {
         command = '\\' + command;
       }
 
@@ -1317,9 +1385,9 @@ var Editor = function () {
       var value = this.value,
           cursorIndex = this.cursorIndex;
 
-      var blocks = '}' + (0, _utils.repeat)('{}', blockCount - 1);
+      var blocks = '}' + repeat('{}', blockCount - 1);
 
-      this.setValue((0, _utils.insertBetween)(value, cursorIndex, blocks));
+      this.setValue(insertBetween(value, cursorIndex, blocks));
       this.update();
     }
 
@@ -1461,7 +1529,7 @@ var Editor = function () {
       }
 
       this.cursorIndex = deletionStart;
-      this.setValue((0, _utils.removeFragment)(this.value, deletionStart, deletionEnd));
+      this.setValue(removeFragment(this.value, deletionStart, deletionEnd));
       this.update();
     }
 
@@ -1508,7 +1576,7 @@ var Editor = function () {
   return Editor;
 }();
 
-exports.default = Editor;
+module.exports = Editor;
 
 /***/ }),
 /* 5 */
@@ -1519,21 +1587,15 @@ exports.default = Editor;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _Editor = __webpack_require__(4);
-
-var _Editor2 = _interopRequireDefault(_Editor);
-
-var _extendMathJax = __webpack_require__(8);
-
-var _extendMathJax2 = _interopRequireDefault(_extendMathJax);
-
-var _utils = __webpack_require__(0);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-window.addEventListener('load', _extendMathJax2.default);
+var Editor = __webpack_require__(4);
+var extendMathJax = __webpack_require__(8);
+
+var _require = __webpack_require__(0),
+    repeat = _require.repeat;
+
+window.addEventListener('load', extendMathJax);
 
 /**
  * This is the MathJaxEditor class.
@@ -1550,10 +1612,10 @@ var MathJaxEditor = function () {
   function MathJaxEditor(options) {
     _classCallCheck(this, MathJaxEditor);
 
-    var core = new _Editor2.default(options);
+    var core = new Editor(options);
 
     this.core = core;
-    this.version = '1.3.0';
+    this.version = '1.3.6';
   }
 
   /**
@@ -1687,14 +1749,14 @@ var MathJaxEditor = function () {
 
   }, {
     key: 'insertMatrix',
-    value: function insertMatrix(rows, columns) {
-      var rowStr = (0, _utils.repeat)('&', rows - 1);
-      var length = columns - 1;
-      var matrix = '\\begin{bmatrix}' + rowStr;
+    value: function insertMatrix(columns, rows) {
+      var columnStr = repeat('&', columns - 1);
+      var lines = rows - 1;
+      var matrix = '\\begin{bmatrix}' + columnStr;
       var i = 0;
 
-      for (; i < length; i++) {
-        matrix += '\\\\' + rowStr;
+      for (; i < lines; i++) {
+        matrix += '\\\\' + columnStr;
       }
 
       matrix += '\\end{bmatrix}';
@@ -1742,19 +1804,11 @@ module.exports = MathJaxEditor;
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _EventBus = __webpack_require__(1);
-
-var _EventBus2 = _interopRequireDefault(_EventBus);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var EventBus = __webpack_require__(1);
 
 var $paints = [];
 
@@ -1770,7 +1824,7 @@ var Placer = function () {
   function Placer(editor) {
     _classCallCheck(this, Placer);
 
-    var bus = new _EventBus2.default();
+    var bus = new EventBus();
 
     bus.on('click', this.handleClick.bind(this));
 
@@ -2349,7 +2403,7 @@ var Placer = function () {
   return Placer;
 }();
 
-exports.default = Placer;
+module.exports = Placer;
 
 /***/ }),
 /* 7 */
@@ -2358,36 +2412,30 @@ exports.default = Placer;
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _utils = __webpack_require__(0);
-
-var _constants = __webpack_require__(2);
-
-var _constants2 = _interopRequireDefault(_constants);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var nearClosureHaystack = _constants2.default.nearClosureHaystack,
-    supOrSub = _constants2.default.supOrSub,
-    cursorTex = _constants2.default.cursorTex,
-    emptyTex = _constants2.default.emptyTex,
-    escType = _constants2.default.escType,
-    spacingTex = _constants2.default.spacingTex,
-    relationCommands = _constants2.default.relationCommands;
+var _require = __webpack_require__(0),
+    inArray = _require.inArray,
+    listToCharacterRegex = _require.listToCharacterRegex;
+
+var constants = __webpack_require__(2);
+
+var nearClosureHaystack = constants.nearClosureHaystack,
+    supOrSub = constants.supOrSub,
+    cursorTex = constants.cursorTex,
+    emptyTex = constants.emptyTex,
+    escType = constants.escType,
+    spacingTex = constants.spacingTex,
+    relationCommands = constants.relationCommands;
 
 
 var test = {
-  isNumber: _constants2.default.number,
-  isVariable: _constants2.default.variable,
-  isOperator: (0, _utils.listToCharacterRegex)(_constants2.default.operators),
-  isEscapedOperator: (0, _utils.listToCharacterRegex)(_constants2.default.escapedOperators)
+  isNumber: constants.number,
+  isVariable: constants.variable,
+  isOperator: listToCharacterRegex(constants.operators),
+  isEscapedOperator: listToCharacterRegex(constants.escapedOperators)
 };
 
 var Tex = function () {
@@ -2460,9 +2508,9 @@ var Tex = function () {
         var char = tex[index];
         var nextChar = tex[nextIndex];
         var lastChar = tex[index - 1];
-        var nearClosure = (0, _utils.inArray)(nextChar, nearClosureHaystack);
+        var nearClosure = inArray(nextChar, nearClosureHaystack);
         var isComma = char === ',';
-        var isGrOrLeSign = (0, _utils.inArray)(char, ['<', '>']);
+        var isGrOrLeSign = inArray(char, ['<', '>']);
         var isNumber = test.isNumber.exec(char);
         var isVariable = test.isVariable.exec(char);
         var isOperator = test.isOperator.exec(char);
@@ -2584,7 +2632,7 @@ var Tex = function () {
         }
 
         // Sup and sub commands.
-        if ((0, _utils.inArray)(char, supOrSub)) {
+        if (inArray(char, supOrSub)) {
           i = this.parseCommand(i).continueIterationAt;
         }
 
@@ -2677,7 +2725,7 @@ var Tex = function () {
         var isVariable = test.isVariable.exec(char);
 
         if (opening === null) {
-          this.displayTex += !(0, _utils.inArray)(char, ['\\', '^', '_']) ? char : '';
+          this.displayTex += !inArray(char, ['\\', '^', '_']) ? char : '';
           if (isVariable) {
             type += char;
           }
@@ -2716,7 +2764,7 @@ var Tex = function () {
             opening = i;
             continueIterationAt = opening;
 
-            if (!(0, _utils.inArray)(firstChar, supOrSub) && !(0, _utils.inArray)(type, ['begin', 'end'])) {
+            if (!inArray(firstChar, supOrSub) && !inArray(type, ['begin', 'end'])) {
               this.displayTex += spacingTex;
             }
 
@@ -2749,13 +2797,13 @@ var Tex = function () {
         }
 
         if (opening === null && char === ' ') {
-          var shouldBeAroundBraces = (0, _utils.inArray)(type, relationCommands);
+          var shouldBeAroundBraces = inArray(type, relationCommands);
           type = this.decideType(type);
           is = type === 'mo' ? 'operator' : 'variable';
           end = i;
           opening = i;
           continueIterationAt = opening;
-          if ((0, _utils.inArray)(nextChar, nearClosureHaystack)) {
+          if (inArray(nextChar, nearClosureHaystack)) {
             nearClosure = true;
           }
           if (shouldBeAroundBraces) {
@@ -2781,7 +2829,7 @@ var Tex = function () {
       // Handle \begin and \end commands.
       // We must skip its blocks contents.
 
-      if ((0, _utils.inArray)(type, ['begin', 'end'])) {
+      if (inArray(type, ['begin', 'end'])) {
         is = type;
         type = blocks[0].contents;
         continueIterationAt = end;
@@ -2904,7 +2952,7 @@ var Tex = function () {
       if (!data) {
         return false;
       }
-      return (0, _utils.inArray)(data.firstChar, haystack);
+      return inArray(data.firstChar, haystack);
     }
 
     /**
@@ -2938,7 +2986,7 @@ var Tex = function () {
         if (!test.isVariable.exec(char) && char !== ' ') {
           return false;
         } else if (char === ' ') {
-          return (0, _utils.inArray)(name, relationCommands);
+          return inArray(name, relationCommands);
         }
         name += char;
       }
@@ -3020,7 +3068,7 @@ var Tex = function () {
   return Tex;
 }();
 
-exports.default = Tex;
+module.exports = Tex;
 
 /***/ }),
 /* 8 */
@@ -3029,22 +3077,13 @@ exports.default = Tex;
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = extendMathJax;
-
-var _styles = __webpack_require__(9);
-
-var _styles2 = _interopRequireDefault(_styles);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var styles = __webpack_require__(9);
 
 /**
  * This will extend MathJax so that we can put our simple
  * cursor there.
  */
-function extendMathJax() {
+module.exports = function extendMathJax() {
   var TEX = MathJax.InputJax.TeX;
   var MML = MathJax.ElementJax.mml;
 
@@ -3101,8 +3140,8 @@ function extendMathJax() {
     });
   });
 
-  MathJax.Ajax.Styles(_styles2.default);
-}
+  MathJax.Ajax.Styles(styles);
+};
 
 /***/ }),
 /* 9 */
@@ -3111,55 +3150,57 @@ function extendMathJax() {
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var animation = 'from, to { border-color: #000 }\n 50% { border-color: transparent }';
+var animation = 'from, to { opacity: 1 }\n 50% { opacity: 0 }';
 
-exports.default = {
-  '.mjx-cursor': {
-    '-webkit-animation': '1s mj-ed-blink step-end infinite',
-    '-moz-animation': '1s mj-ed-blink step-end infinite',
-    '-ms-animation': '1s mj-ed-blink step-end infinite',
-    '-o-animation': '1s mj-ed-blink step-end infinite',
-    animation: '1s mj-ed-blink step-end infinite',
-    'border-right': '2px solid #000',
-    color: 'transparent'
+module.exports = {
+  '.Mathjax_Editor': {
+    '-moz-user-select': 'none',
+    '-webkit-user-select': 'none',
+    '-ms-user-select': 'none',
+    'user-select': 'none'
   },
 
-  '.mjx-cursor.wasRecentlyPlaced': {
-    'border-right-color': '#000 !important'
+  '.Mathjax_EditorCursor.wasRecentlyPlaced': {
+    'animation': 'none !important',
+    'opacity': '1 !important'
   },
 
-  '.mj-ed-input': {
+  '.Mathjax_EditorInput': {
     left: '-100%',
     position: 'absolute',
     top: '-100%'
   },
 
-  '.mj-ed-display': {
+  '.Mathjax_EditorDisplay': {
     'box-sizing': 'border-box',
     'cursor': 'text',
     'overflow-Y': 'overflow'
   },
 
-  '.mj-ed-display *': {
+  '.Mathjax_EditorDisplay *': {
     outline: 'none'
   },
 
-  '.mj-ed-selectionButton': {
-    cursor: 'text'
+  '.Mathjax_EditorCursor': {
+    '-webkit-animation': '1s Mathjax_EditorCursorBlink step-end infinite',
+    '-moz-animation': '1s Mathjax_EditorCursorBlink step-end infinite',
+    '-ms-animation': '1s Mathjax_EditorCursorBlink step-end infinite',
+    '-o-animation': '1s Mathjax_EditorCursorBlink step-end infinite',
+    animation: '1s Mathjax_EditorCursorBlink step-end infinite',
+    'background-color': '#000',
+    position: 'absolute',
+    width: '2px'
   },
 
   '.mjx-isEmpty': {
     color: '#ccc'
   },
 
-  '@keyframes mj-ed-blink': animation,
-  '@-moz-keyframes mj-ed-blink': animation,
-  '@-webkit-keyframes mj-ed-blink': animation,
-  '@-ms-keyframes mj-ed-blink': animation,
-  '@-o-keyframes mj-ed-blink': animation
+  '@keyframes Mathjax_EditorCursorBlink': animation,
+  '@-moz-keyframes Mathjax_EditorCursorBlink': animation,
+  '@-webkit-keyframes Mathjax_EditorCursorBlink': animation,
+  '@-ms-keyframes Mathjax_EditorCursorBlink': animation,
+  '@-o-keyframes Mathjax_EditorCursorBlink': animation
 };
 
 /***/ }),
@@ -3204,7 +3245,7 @@ var Key = function () {
       if (this.key.label) {
         return "\\(" + this.key.label + "\\)";
       }
-      return "<i class=\"material-icons\">" + this.key.$label + "</i>";
+      return "<i class=\"Mathjax_KeyboardIcon Mathjax_KeyboardIcon_" + this.key.$label + "\"></i>";
     }
 
     /**
@@ -3564,20 +3605,20 @@ var pages = [
     return editor.insertCommand('Omega');
   } }, null, null, null, null]]];
 
-var controlKeys = [{ $label: '&#xE5C4;', onClick: function onClick(editor, keyboard) {
+var controlKeys = [{ $label: 'Left', onClick: function onClick(editor, keyboard) {
     return keyboard.previousPage();
-  } }, { $label: '&#xE5C8;', onClick: function onClick(editor, keyboard) {
+  } }, { $label: 'Right', onClick: function onClick(editor, keyboard) {
     return keyboard.nextPage();
-  } }, null, null, { $label: '&#xE314;', onClick: function onClick(editor) {
+  } }, null, null, { $label: 'PadLeft', onClick: function onClick(editor) {
     return editor.moveCursorLeft();
   } }, // Left arrow (move cursor)
-{ $label: '&#xE315;', onClick: function onClick(editor) {
+{ $label: 'PadRight', onClick: function onClick(editor) {
     return editor.moveCursorRight();
   } }, // Right arrow
-{ $label: '&#xE14A;', onClick: function onClick(editor) {
+{ $label: 'Backspace', onClick: function onClick(editor) {
     return editor.erase();
   } }, // Backspace
-{ $label: '&#xE5D9;', onClick: function onClick(editor) {
+{ $label: 'Enter', onClick: function onClick(editor) {
     return editor.core.insert('\\\\');
   } }];
 
@@ -3600,10 +3641,31 @@ function onLoad() {
       'border-radius': '5px',
       height: '100%',
       left: 0,
-      overflow: 'hidden',
       position: 'absolute',
       top: 0,
       width: '100%'
+    },
+
+    '.mjk-arrow, .mjk-arrow:after, .mjk-arrow:before': {
+      'border-left': '20px solid transparent',
+      'border-right': '20px solid transparent',
+      'border-bottom': '20px solid #fff',
+      'content': '""',
+      'display': 'block',
+      'position': 'absolute',
+      'top': '-18px'
+    },
+
+    '.mjk-arrow:after': {
+      'left': '-20px',
+      'top': 0
+    },
+
+    '.mjk-arrow:before': {
+      'top': '-3px',
+      'left': '-23px',
+      'border-bottom-color': '#ccc',
+      'border-width': '23px'
     },
 
     '.mjk-keyboard': {
@@ -3662,6 +3724,40 @@ function onLoad() {
 
     '.mjk-input .mj-ed-display': {
       border: 'none !important'
+    },
+
+    '.Mathjax_KeyboardIcon': {
+      display: 'inline-block',
+      background: 'url(\'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAwCAYAAABwrHhvAAAACXBIWXMAAA7EAAAOxAGVKw4bAAADwklEQVRYhcWYQWgcVRjH/9/MZClB4qWrOzNBPAkW2TrzXtIeDVZoD72EqqQnBQ96EYN3JblYEE1vhRZPQgu28dJbL0YUrLIzCYs2Z6HMzNJeKhi0bt7nIdll9u3Mzkw2u/3f3sz3vf/vfW/me7NrQpOUcqPRaLwax/F9/V5VSSnXHMdZiqJoKy/GTA+EEF8BWCWi87ZtPxkHwvO8U0R0E8CS67pGHsQAgOu6cwCWARjjQiRJ8sh13d3D+XIhBgCiKHqQShobQpsvE8IsSJo4xBDAtCEyAaYJQUWJUspLzHwLgAUAzLwahuHV3n0hBB8FCACIaN0oClJKFcaMo5EV8H3/MhF9C8AAhldfVelqEtF6q9X6PHd1vu+/N2lzIKcCQogPANzojSdlDhyuTjP/cFrmQwBCiI8BXJuW+RAAgNnjMvc871SROaA1ojiOf3Yc5wQzb45jDvQPI4uIfswzryTf9z+RUm6MPZGm3FasmxPRBoCzjuPMxXF877gArArmANAlol/yYhcWFs4ppb4B8FIJ76cArhR1Qt18pdVq3cmKbTabL8zMzPwB4GQJ8z7EqE5Y2hwALMu6ppk/BrCnhT3UxrVMgKrmvu+/Q0TL6WvM/C4zX0xBtGu12mkiup6OG9qCquae5500DGMXw6X/XSm1RERNIvrCNM0LSimfme8CONELGqhAVXMAMAxDL31PrxmG8QMzt4MgONPtdl/XzYcAnoUGAMIwvMrMq4dDi5lvSSkvjZpAKfURDh44Xf0tEEL8alnWDhFdBPBPOmioEcVxfN+27SdEdP4QcNl13d0oih5kASRJsmfb9p9E9Hb6OjOvENGLRHQXwMvMfKFWq11RStUBiF5cbh84wpuwqb0Jj3FwuM2mrj0EMJ/Oy23FVStRr9e3TNN8P2U4C2BGC5vTxk9HngVVIDqdzt/z8/PbzPwGgOdHzdszR1Er7knbjq+DIPi0TN6xalLH8UQlpVyTUq6Niim1BUc1Z+bPAHSVUqe3t7czH96JdMK0ORGt5JlnAkgp14QQN7KC01pcXHzF9/2zReaFZ0lOcrPZbM7m5AAA9vf3v9S/jqqaDwCkkn8D8Fa73dY/JkbqKOZ9AN08CIK/pmEOAJRKBg56ddmVOwCeI6L1VH5lFX4Vj1A0Rm5fBDzbLTABIIqiLdd1DQCXAbzpOM53cRz/W3aSVP4SCk7NTIAsiHq9frPT6fw3aQj9j8reJHs7OzvflzUfB2IiZ0GVZ6LUj9Oq0ivRaDQ2kyR5NDWANAQR/RSG4e28uP8BIwt4gmvglcAAAAAASUVORK5CYII=\') no-repeat',
+      height: '16px',
+      overflow: 'hidden',
+      'text-indent': '-9999px',
+      'text-align': 'left',
+      'width': '16px'
+    },
+
+    '.Mathjax_KeyboardIcon_PadRight': {
+      'background-position': '-0px -0px'
+    },
+
+    '.Mathjax_KeyboardIcon_Right': {
+      'background-position': '-16px -0px'
+    },
+
+    '.Mathjax_KeyboardIcon_PadLeft': {
+      'background-position': '-0px -16px'
+    },
+
+    '.Mathjax_KeyboardIconBackspace': {
+      'background-position': '-16px -16px'
+    },
+
+    '.Mathjax_KeyboardIcon_Enter': {
+      'background-position': '-0px -32px'
+    },
+
+    '.Mathjax_KeyboardIcon_Left': {
+      'background-position': '-16px -32px'
     }
   };
 
@@ -3764,6 +3860,8 @@ function findClass($el, className) {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _utils = __webpack_require__(0);
+
 var _Core = __webpack_require__(3);
 
 var _Core2 = _interopRequireDefault(_Core);
@@ -3786,7 +3884,7 @@ var MathJaxEditorKeyboard = function () {
     var core = new _Core2.default(options);
 
     this.editor = core.editor;
-    this.version = '1.1.4';
+    this.version = '1.1.5';
   }
 
   /**
@@ -3832,6 +3930,19 @@ var MathJaxEditorKeyboard = function () {
 
   return MathJaxEditorKeyboard;
 }();
+
+// HTML API WIP
+
+window.addEventListener('load', function () {
+  (0, _utils.toArray)(document.getElementsByClassName('mathjax-editor-html')).forEach(function ($el) {
+    var scroll = $el.getAttribute('data-scroll');
+    var options = {
+      el: $el,
+      scroll: scroll === 'true'
+    };
+    $el.mathjaxEditor = new MathJaxEditorKeyboard(options);
+  });
+});
 
 module.exports = MathJaxEditorKeyboard;
 
