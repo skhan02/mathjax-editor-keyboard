@@ -26,18 +26,19 @@ class Core {
     $container.appendChild($arrow);
     document.body.appendChild($container);
 
-    const editor = new MathJaxEditor(options);
+    const mathjaxEditor = new MathJaxEditor(options);
 
-    this.editor = editor;
+    this.mathjaxEditor = mathjaxEditor;
     this.isMobile = (viewportWidth < 640);
     this.isVisible = false;
     this.pageIndex = 0;
     this.$arrow = $arrow;
     this.$container = $container;
-    this.$el = editor.core.$el;
+    this.$el = mathjaxEditor.core.$el;
+    this.$cursor = mathjaxEditor.core.$cursor;
     this.$keyboard = $keyboard;
-    this.$editorContainer = editor.core.$container;
-    this.$editorInput = editor.core.$input;
+    this.$editorContainer = mathjaxEditor.core.$container;
+    this.$editorInput = mathjaxEditor.core.$input;
 
     document.addEventListener('mousedown', this.handleDocumentClick.bind(this));
 
@@ -51,7 +52,7 @@ class Core {
    */
   render() {
     const Element = MathJax.HTML.Element;
-    const { $keyboard, editor, pageIndex } = this;
+    const { $keyboard, mathjaxEditor, pageIndex } = this;
 
     const keys = Keys.getPage(pageIndex);
     const keyColumns = Keys.getKeyColumns();
@@ -81,7 +82,7 @@ class Core {
 
           $key.innerHTML = key.getLabel();
           $key.addEventListener('click', () => {
-            listener(editor, this);
+            listener(mathjaxEditor, this);
             this.updateInputElement();
           }); 
         }
@@ -108,10 +109,12 @@ class Core {
   updateInputElement() {
     const {
       $arrow,
+      $cursor,
       $keyboard,
       $container,
       $editorContainer,
-      $editorInput
+      $editorInput,
+      mathjaxEditor
     } = this;
     const viewportWidth = window.innerWidth;
     const { top } = $keyboard.getBoundingClientRect();
@@ -121,6 +124,7 @@ class Core {
 
       $editorInput.setAttribute('readonly', 'true');
       $container.appendChild($editorContainer);
+      $container.appendChild($cursor);
       addClass($editorContainer, 'mjk-input');
       addClass($keyboard, 'isMobile');
       removeClass($keyboard, 'isDesktop');
@@ -162,6 +166,11 @@ class Core {
     const { $editorContainer, $el } = this;
     removeClass($editorContainer, 'mjk-input');
     $el.parentNode.insertBefore($editorContainer, $el.nextSibling);
+  }
+
+  appendCursorToContainer() {
+    const { $container, $cursor } = this;
+    $container.appendChild($cursor);
   }
 
   /**
@@ -215,7 +224,7 @@ class Core {
 
     this.isVisible = true;
     this.$container.style.display = 'block';
-    this.editor.focus();
+    this.mathjaxEditor.focus();
     this.render();
   }
 
@@ -226,7 +235,7 @@ class Core {
    */
   hideKeyboard() {
     this.isVisible = false;
-    this.editor.blur();
+    this.mathjaxEditor.blur();
     this.$container.style.display = 'none';
     this.appendEditorNextToTargetElement();
   }
