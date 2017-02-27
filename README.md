@@ -10,7 +10,7 @@ npm install mathjax-editor-keyboard
 
 or just grab `dist/MathJaxEditorKeyboard.js`.
 
-You just need MathJax, [MathJax Editor](https://github.com/ianlucas/mathjax-editor) is already bundlered.
+You must include MathJax, [MathJax Editor](https://github.com/ianlucas/mathjax-editor) is already bundlered.
 
 ## Usage
 
@@ -24,13 +24,37 @@ const editor = new MathJaxEditorKeyboard({
 })
 ```
 
-MathJax Editor Keyboard's options are the same as MathJax Editor, [see them here](https://github.com/ianlucas/mathjax-editor).
+### HTML API
+
+You can quickly setup an editor only using HTML, like this:
+
+``` html
+<textarea class="mathjax-editor-html" data-scroll="true" data-value="hello" data-new-line="false"></textarea>
+```
+
+### `MathJaxEditor(options)`
+
+#### `options.el`
+
+The target element. It can be a selector string or a DOM Element.
+
+#### `options.newLine`
+
+Enable new line insertion. Default is **`false`**.
+
+#### `options.scroll`
+
+Enable scroll to display element. Default is **`false`**, so the display `overflow` is `hidden`.
+
+#### `options.value`
+
+Define the default editor value.
 
 ### API
 
 #### `editor.getValue()`
-
-Get the value of the editor.
+#### `editor.setValue(value)`
+#### `editor.on(type, listener) // available events are "change", "focus", and "blur".`
 
 ---
 
