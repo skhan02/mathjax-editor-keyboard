@@ -112,7 +112,7 @@ function onLoad() {
       'background-position': '-0px -16px'
     },
 
-    '.Mathjax_KeyboardIconBackspace': {
+    '.Mathjax_KeyboardIcon_Backspace': {
       'background-position': '-16px -16px'
     },
 
