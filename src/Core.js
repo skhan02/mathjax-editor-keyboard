@@ -168,6 +168,11 @@ class Core {
     $el.parentNode.insertBefore($editorContainer, $el.nextSibling);
   }
 
+  /**
+   * Append the cursor to the container.
+   * 
+   * @return {Void}
+   */
   appendCursorToContainer() {
     const { $container, $cursor } = this;
     $container.appendChild($cursor);
