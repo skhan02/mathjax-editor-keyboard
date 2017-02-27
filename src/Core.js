@@ -34,9 +34,9 @@ class Core {
     this.pageIndex = 0;
     this.$arrow = $arrow;
     this.$container = $container;
+    this.$el = editor.core.$el;
     this.$keyboard = $keyboard;
     this.$editorContainer = editor.core.$container;
-    this.$editorContainerParent = editor.core.$container.parentNode;
     this.$editorInput = editor.core.$input;
 
     document.addEventListener('mousedown', this.handleDocumentClick.bind(this));
@@ -149,7 +149,7 @@ class Core {
       removeClass($keyboard, 'isMobile');
       applyStyles($arrow, { display: 'block' });
 
-      this.appendEditorToItsOriginalParent();
+      this.appendEditorNextToTargetElement();
     }
   }
 
@@ -158,10 +158,10 @@ class Core {
    * 
    * @return {Void}
    */
-  appendEditorToItsOriginalParent() {
-    const { $editorContainer, $editorContainerParent } = this;
+  appendEditorNextToTargetElement() {
+    const { $editorContainer, $el } = this;
     removeClass($editorContainer, 'mjk-input');
-    $editorContainerParent.appendChild($editorContainer);
+    $el.parentNode.insertBefore($editorContainer, $el.nextSibling);
   }
 
   /**
@@ -184,6 +184,7 @@ class Core {
       const keyboardBounding = $keyboard.getBoundingClientRect();
       const margin = 16;
       let leftPos = editorContainerBouncing.left + (editorContainerBouncing.width / 2) - (keyboardBounding.width / 2);
+
       height = keyboardBounding.height;
       left = leftPos;
       top = editorContainerBouncing.top + editorContainerBouncing.height + margin;
@@ -227,7 +228,7 @@ class Core {
     this.isVisible = false;
     this.editor.blur();
     this.$container.style.display = 'none';
-    this.appendEditorToItsOriginalParent();
+    this.appendEditorNextToTargetElement();
   }
 
   /**
