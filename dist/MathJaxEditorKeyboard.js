@@ -394,31 +394,24 @@ module.exports = {
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _mathjaxEditor = __webpack_require__(5);
-
-var _mathjaxEditor2 = _interopRequireDefault(_mathjaxEditor);
-
-var _Keys = __webpack_require__(11);
-
-var _Keys2 = _interopRequireDefault(_Keys);
-
-var _utils = __webpack_require__(0);
-
-var _utils2 = __webpack_require__(14);
-
-var _styles = __webpack_require__(13);
-
-var _styles2 = _interopRequireDefault(_styles);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var MathJaxEditor = __webpack_require__(5);
+var Keys = __webpack_require__(11);
+
+var _require = __webpack_require__(0),
+    addClass = _require.addClass,
+    removeClass = _require.removeClass;
+
+var _require2 = __webpack_require__(14),
+    applyStyles = _require2.applyStyles,
+    emptyElement = _require2.emptyElement,
+    findNode = _require2.findNode,
+    findClass = _require2.findClass;
+
+var styles = __webpack_require__(13);
 
 var keyboardWidth = 320;
 
@@ -444,18 +437,19 @@ var Core = function () {
     $container.appendChild($arrow);
     document.body.appendChild($container);
 
-    var editor = new _mathjaxEditor2.default(options);
+    var mathjaxEditor = new MathJaxEditor(options);
 
-    this.editor = editor;
+    this.mathjaxEditor = mathjaxEditor;
     this.isMobile = viewportWidth < 640;
     this.isVisible = false;
     this.pageIndex = 0;
     this.$arrow = $arrow;
     this.$container = $container;
+    this.$el = mathjaxEditor.core.$el;
+    this.$cursor = mathjaxEditor.core.$cursor;
     this.$keyboard = $keyboard;
-    this.$editorContainer = editor.core.$container;
-    this.$editorContainerParent = editor.core.$container.parentNode;
-    this.$editorInput = editor.core.$input;
+    this.$editorContainer = mathjaxEditor.core.$container;
+    this.$editorInput = mathjaxEditor.core.$input;
 
     document.addEventListener('mousedown', this.handleDocumentClick.bind(this));
 
@@ -476,23 +470,23 @@ var Core = function () {
 
       var Element = MathJax.HTML.Element;
       var $keyboard = this.$keyboard,
-          editor = this.editor,
+          mathjaxEditor = this.mathjaxEditor,
           pageIndex = this.pageIndex;
 
 
-      var keys = _Keys2.default.getPage(pageIndex);
-      var keyColumns = _Keys2.default.getKeyColumns();
+      var keys = Keys.getPage(pageIndex);
+      var keyColumns = Keys.getKeyColumns();
       var keyWidth = (keyboardWidth - 20) / keyColumns;
       var keyWidthPx = keyWidth + 'px';
 
-      (0, _utils2.emptyElement)($keyboard);
+      emptyElement($keyboard);
       $keyboard.style.width = keyboardWidth + 'px';
 
       keys.forEach(function (rows, i) {
         var $row = Element('div', { className: 'mjk-keyRow' });
 
         rows.forEach(function (column, j) {
-          var key = _Keys2.default.getKey(pageIndex, i, j);
+          var key = Keys.getKey(pageIndex, i, j);
 
           var $key = Element('button', {
             className: 'mjk-key',
@@ -508,7 +502,7 @@ var Core = function () {
 
             $key.innerHTML = key.getLabel();
             $key.addEventListener('click', function () {
-              listener(editor, _this);
+              listener(mathjaxEditor, _this);
               _this.updateInputElement();
             });
           } else {
@@ -536,10 +530,12 @@ var Core = function () {
     key: 'updateInputElement',
     value: function updateInputElement() {
       var $arrow = this.$arrow,
+          $cursor = this.$cursor,
           $keyboard = this.$keyboard,
           $container = this.$container,
           $editorContainer = this.$editorContainer,
-          $editorInput = this.$editorInput;
+          $editorInput = this.$editorInput,
+          mathjaxEditor = this.mathjaxEditor;
 
       var viewportWidth = window.innerWidth;
 
@@ -551,34 +547,35 @@ var Core = function () {
 
         $editorInput.setAttribute('readonly', 'true');
         $container.appendChild($editorContainer);
-        (0, _utils.addClass)($editorContainer, 'mjk-input');
-        (0, _utils.addClass)($keyboard, 'isMobile');
-        (0, _utils.removeClass)($keyboard, 'isDesktop');
+        $container.appendChild($cursor);
+        addClass($editorContainer, 'mjk-input');
+        addClass($keyboard, 'isMobile');
+        removeClass($keyboard, 'isDesktop');
 
-        (0, _utils2.applyStyles)($keyboard, {
+        applyStyles($keyboard, {
           paddingLeft: padding,
           paddingRight: padding
         });
 
-        (0, _utils2.applyStyles)($editorContainer, {
+        applyStyles($editorContainer, {
           fontSize: 12,
           left: 0,
           width: viewportWidth
         });
 
-        (0, _utils2.applyStyles)($editorContainer, {
+        applyStyles($editorContainer, {
           top: top - $editorContainer.offsetHeight
         });
 
-        (0, _utils2.applyStyles)($arrow, {
+        applyStyles($arrow, {
           display: 'none'
         });
       } else {
-        (0, _utils.addClass)($keyboard, 'isDesktop');
-        (0, _utils.removeClass)($keyboard, 'isMobile');
-        (0, _utils2.applyStyles)($arrow, { display: 'block' });
+        addClass($keyboard, 'isDesktop');
+        removeClass($keyboard, 'isMobile');
+        applyStyles($arrow, { display: 'block' });
 
-        this.appendEditorToItsOriginalParent();
+        this.appendEditorNextToTargetElement();
       }
     }
 
@@ -589,13 +586,28 @@ var Core = function () {
      */
 
   }, {
-    key: 'appendEditorToItsOriginalParent',
-    value: function appendEditorToItsOriginalParent() {
+    key: 'appendEditorNextToTargetElement',
+    value: function appendEditorNextToTargetElement() {
       var $editorContainer = this.$editorContainer,
-          $editorContainerParent = this.$editorContainerParent;
+          $el = this.$el;
 
-      (0, _utils.removeClass)($editorContainer, 'mjk-input');
-      $editorContainerParent.appendChild($editorContainer);
+      removeClass($editorContainer, 'mjk-input');
+      $el.parentNode.insertBefore($editorContainer, $el.nextSibling);
+    }
+
+    /**
+     * Append the cursor to the container.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'appendCursorToContainer',
+    value: function appendCursorToContainer() {
+      var $container = this.$container,
+          $cursor = this.$cursor;
+
+      $container.appendChild($cursor);
     }
 
     /**
@@ -627,17 +639,18 @@ var Core = function () {
         var keyboardBounding = $keyboard.getBoundingClientRect();
         var margin = 16;
         var leftPos = editorContainerBouncing.left + editorContainerBouncing.width / 2 - keyboardBounding.width / 2;
+
         height = keyboardBounding.height;
         left = leftPos;
         top = editorContainerBouncing.top + editorContainerBouncing.height + margin;
         width = keyboardBounding.width;
 
-        (0, _utils2.applyStyles)($arrow, {
+        applyStyles($arrow, {
           left: width / 2 - 20
         });
       }
 
-      (0, _utils2.applyStyles)($container, {
+      applyStyles($container, {
         height: height,
         left: left,
         top: top,
@@ -660,7 +673,7 @@ var Core = function () {
 
       this.isVisible = true;
       this.$container.style.display = 'block';
-      this.editor.focus();
+      this.mathjaxEditor.focus();
       this.render();
     }
 
@@ -674,9 +687,9 @@ var Core = function () {
     key: 'hideKeyboard',
     value: function hideKeyboard() {
       this.isVisible = false;
-      this.editor.blur();
+      this.mathjaxEditor.blur();
       this.$container.style.display = 'none';
-      this.appendEditorToItsOriginalParent();
+      this.appendEditorNextToTargetElement();
     }
 
     /**
@@ -702,10 +715,10 @@ var Core = function () {
       if (this.isMobile && $target === $container) {
         return this.hideKeyboard();
       }
-      if ((0, _utils2.findNode)($target, $editorContainer)) {
+      if (findNode($target, $editorContainer)) {
         return this.showKeyboard();
       }
-      if (!(0, _utils2.findNode)($target, $container) && !(0, _utils2.findClass)($target, 'mjk-key')) {
+      if (!findNode($target, $container) && !findClass($target, 'mjk-key')) {
         return this.hideKeyboard();
       }
     }
@@ -719,7 +732,7 @@ var Core = function () {
   }, {
     key: 'nextPage',
     value: function nextPage() {
-      var length = _Keys2.default.getPagesLength();
+      var length = Keys.getPagesLength();
       var index = void 0;
 
       if (this.pageIndex === length - 1) {
@@ -741,7 +754,7 @@ var Core = function () {
   }, {
     key: 'previousPage',
     value: function previousPage() {
-      var length = _Keys2.default.getPagesLength();
+      var length = Keys.getPagesLength();
       var index = void 0;
 
       if (this.pageIndex === 0) {
@@ -758,7 +771,7 @@ var Core = function () {
   return Core;
 }();
 
-exports.default = Core;
+module.exports = Core;
 
 /***/ }),
 /* 4 */
@@ -3210,10 +3223,6 @@ module.exports = {
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -3276,7 +3285,7 @@ var Key = function () {
   return Key;
 }();
 
-exports.default = Key;
+module.exports = Key;
 
 /***/ }),
 /* 11 */
@@ -3285,26 +3294,15 @@ exports.default = Key;
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _Key = __webpack_require__(10);
-
-var _Key2 = _interopRequireDefault(_Key);
-
-var _pages = __webpack_require__(12);
-
-var _pages2 = _interopRequireDefault(_pages);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var pages = _pages2.default.pages,
-    controlKeys = _pages2.default.controlKeys;
+var Key = __webpack_require__(10);
+var data = __webpack_require__(12);
+
+var pages = data.pages,
+    controlKeys = data.controlKeys;
 
 
 var pagesLength = pages.length;
@@ -3384,14 +3382,14 @@ var Keys = function () {
   }, {
     key: 'getKey',
     value: function getKey(pageIndex, i, j) {
-      return new _Key2.default(pages[pageIndex][i][j]);
+      return new Key(pages[pageIndex][i][j]);
     }
   }]);
 
   return Keys;
 }();
 
-exports.default = Keys;
+module.exports = Keys;
 
 /***/ }),
 /* 12 */
@@ -3400,9 +3398,6 @@ exports.default = Keys;
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 var pages = [
 // Page 0
 [[{ label: '(', onClick: function onClick(editor) {
@@ -3622,7 +3617,7 @@ var controlKeys = [{ $label: 'Left', onClick: function onClick(editor, keyboard)
     return editor.core.insert('\\\\');
   } }];
 
-exports.default = {
+module.exports = {
   pages: pages,
   controlKeys: controlKeys
 };
@@ -3748,7 +3743,7 @@ function onLoad() {
       'background-position': '-0px -16px'
     },
 
-    '.Mathjax_KeyboardIconBackspace': {
+    '.Mathjax_KeyboardIcon_Backspace': {
       'background-position': '-16px -16px'
     },
 
@@ -3773,83 +3768,81 @@ window.addEventListener('load', onLoad);
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.applyStyles = applyStyles;
-exports.emptyElement = emptyElement;
-exports.findNode = findNode;
-exports.findClass = findClass;
-/**
- * Apply styles to an element.
- * 
- * @param {DOMElement} $el
- * @param {Object} styles
- * 
- * @return {Void}
- */
-function applyStyles($el, styles) {
-  Object.keys(styles).forEach(function (property) {
-    var value = styles[property];
-    if (typeof value === 'number') {
-      value = value + 'px';
-    }
-    $el.style[property] = value;
-  });
-}
+module.exports = {
+  /**
+   * Apply styles to an element.
+   * 
+   * @param {DOMElement} $el
+   * @param {Object} styles
+   * 
+   * @return {Void}
+   */
+  applyStyles: function applyStyles($el, styles) {
+    Object.keys(styles).forEach(function (property) {
+      var value = styles[property];
+      if (typeof value === 'number') {
+        value = value + 'px';
+      }
+      $el.style[property] = value;
+    });
+  },
 
-/**
- * Removes all children of an element.
- * 
- * @param {DOMElement} $el
- * 
- * @return {Void}
- */
-function emptyElement($el) {
-  while ($el.firstChild) {
-    $el.removeChild($el.firstChild);
-  }
-}
 
-/**
- * Find a parent node.
- * 
- * @param {DOMElement} $el
- * 
- * @return {Boolean}
- */
-function findNode($at, $el) {
-  var $parent = $at;
-  while ($parent) {
-    if ($parent === $el) {
-      return true;
+  /**
+   * Removes all children of an element.
+   * 
+   * @param {DOMElement} $el
+   * 
+   * @return {Void}
+   */
+  emptyElement: function emptyElement($el) {
+    while ($el.firstChild) {
+      $el.removeChild($el.firstChild);
     }
-    $parent = $parent.parentNode;
-  }
-  return false;
-}
+  },
 
-/**
- * Find a class in a node.
- * 
- * @param {DOMElement} $el
- * @param {String} className
- * 
- * @return {Boolean}
- */
-function findClass($el, className) {
-  var $parent = $el;
-  while ($parent) {
-    if (!$parent) {
-      return false;
+
+  /**
+   * Find a parent node.
+   * 
+   * @param {DOMElement} $el
+   * 
+   * @return {Boolean}
+   */
+  findNode: function findNode($at, $el) {
+    var $parent = $at;
+    while ($parent) {
+      if ($parent === $el) {
+        return true;
+      }
+      $parent = $parent.parentNode;
     }
-    if ($parent.className && ~$parent.className.indexOf(className)) {
-      return true;
+    return false;
+  },
+
+
+  /**
+   * Find a class in a node.
+   * 
+   * @param {DOMElement} $el
+   * @param {String} className
+   * 
+   * @return {Boolean}
+   */
+  findClass: function findClass($el, className) {
+    var $parent = $el;
+    while ($parent) {
+      if (!$parent) {
+        return false;
+      }
+      if ($parent.className && ~$parent.className.indexOf(className)) {
+        return true;
+      }
+      $parent = $parent.parentNode;
     }
-    $parent = $parent.parentNode;
+    return false;
   }
-  return false;
-}
+};
 
 /***/ }),
 /* 15 */
@@ -3860,15 +3853,12 @@ function findClass($el, className) {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _utils = __webpack_require__(0);
-
-var _Core = __webpack_require__(3);
-
-var _Core2 = _interopRequireDefault(_Core);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var _require = __webpack_require__(0),
+    toArray = _require.toArray;
+
+var Core = __webpack_require__(3);
 
 var MathJaxEditorKeyboard = function () {
   /**
@@ -3881,10 +3871,10 @@ var MathJaxEditorKeyboard = function () {
   function MathJaxEditorKeyboard(options) {
     _classCallCheck(this, MathJaxEditorKeyboard);
 
-    var core = new _Core2.default(options);
+    var core = new Core(options);
 
-    this.editor = core.editor;
-    this.version = '1.1.5';
+    this.mathjaxEditor = core.mathjaxEditor;
+    this.version = '1.2.0';
   }
 
   /**
@@ -3897,7 +3887,7 @@ var MathJaxEditorKeyboard = function () {
   _createClass(MathJaxEditorKeyboard, [{
     key: 'getValue',
     value: function getValue() {
-      return this.editor.getValue();
+      return this.mathjaxEditor.getValue();
     }
 
     /**
@@ -3909,7 +3899,7 @@ var MathJaxEditorKeyboard = function () {
   }, {
     key: 'setValue',
     value: function setValue(value) {
-      return this.editor.setValue(value);
+      return this.mathjaxEditor.setValue(value);
     }
 
     /**
@@ -3924,22 +3914,33 @@ var MathJaxEditorKeyboard = function () {
   }, {
     key: 'on',
     value: function on(type, listener) {
-      this.editor.on(type, listener);
+      this.mathjaxEditor.on(type, listener);
     }
   }]);
 
   return MathJaxEditorKeyboard;
 }();
 
-// HTML API WIP
+/**
+ * This is the HTML API to quickly use the editor.
+ */
+
 
 window.addEventListener('load', function () {
-  (0, _utils.toArray)(document.getElementsByClassName('mathjax-editor-html')).forEach(function ($el) {
+  toArray(document.getElementsByClassName('mathjax-editor-html')).forEach(function ($el) {
     var scroll = $el.getAttribute('data-scroll');
+    var newLine = $el.getAttribute('data-new-line');
+    var value = $el.getAttribute('data-value');
     var options = {
       el: $el,
-      scroll: scroll === 'true'
+      scroll: scroll === 'true',
+      newLine: newLine === 'true'
     };
+
+    if (value && value.length) {
+      options.value = value;
+    }
+
     $el.mathjaxEditor = new MathJaxEditorKeyboard(options);
   });
 });
