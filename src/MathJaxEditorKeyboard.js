@@ -12,7 +12,7 @@ class MathJaxEditorKeyboard {
   constructor(options) {
     const core = new Core(options);
 
-    this.editor = core.editor;
+    this.mathjaxEditor = core.mathjaxEditor;
     this.version = '1.1.5';
   }
 
@@ -22,7 +22,7 @@ class MathJaxEditorKeyboard {
    * @return {String}
    */
   getValue() {
-    return this.editor.getValue();
+    return this.mathjaxEditor.getValue();
   }
 
   /**
@@ -31,7 +31,7 @@ class MathJaxEditorKeyboard {
    * @return {String}
    */
   setValue(value) {
-    return this.editor.setValue(value);
+    return this.mathjaxEditor.setValue(value);
   }
 
   /**
@@ -43,7 +43,7 @@ class MathJaxEditorKeyboard {
    * @return {Void}
    */
   on(type, listener) {
-    this.editor.on(type, listener);
+    this.mathjaxEditor.on(type, listener);
   }
 }
 
