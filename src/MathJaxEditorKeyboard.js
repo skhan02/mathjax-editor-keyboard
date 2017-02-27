@@ -1,5 +1,5 @@
-import { toArray } from 'mathjax-editor/src/utils'
-import Core from './Core';
+const { toArray } = require('mathjax-editor/src/utils');
+const Core = require('./Core');
 
 class MathJaxEditorKeyboard {
   /**

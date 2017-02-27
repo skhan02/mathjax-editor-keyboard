@@ -1,8 +1,8 @@
-import MathJaxEditor from 'mathjax-editor';
-import Keys from './Keys';
-import { addClass, removeClass } from 'mathjax-editor/src/utils';
-import { applyStyles, emptyElement, findNode, findClass } from './utils';
-import styles from './styles';
+const MathJaxEditor = require('mathjax-editor');
+const Keys = require('./Keys');
+const { addClass, removeClass } = require('mathjax-editor/src/utils');
+const { applyStyles, emptyElement, findNode, findClass } = require('./utils');
+const styles = require('./styles');
 
 const keyboardWidth = 320;
 
@@ -312,4 +312,4 @@ class Core {
   }
 }
 
-export default Core;
+module.exports = Core;

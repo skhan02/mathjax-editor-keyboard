@@ -1,5 +1,5 @@
-import Key from './Key';
-import data from './pages';
+const Key = require('./Key');
+const data = require('./pages');
 
 let { pages, controlKeys } = data;
 
@@ -65,4 +65,4 @@ class Keys {
   }
 }
 
-export default Keys;
+module.exports = Keys;

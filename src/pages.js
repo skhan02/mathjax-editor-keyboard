@@ -171,7 +171,7 @@ const controlKeys = [
   { $label: 'Enter', onClick: editor => editor.core.insert('\\\\') }
 ];
 
-export default {
+module.exports = {
   pages,
   controlKeys
 };
