@@ -47,16 +47,25 @@ class MathJaxEditorKeyboard {
   }
 }
 
-// HTML API WIP
-
+/**
+ * This is the HTML API to quickly use the editor.
+ */
 window.addEventListener('load', () => {
   toArray(document.getElementsByClassName('mathjax-editor-html'))
     .forEach($el => {
       const scroll = $el.getAttribute('data-scroll');
+      const newLine = $el.getAttribute('data-new-line');
+      const value = $el.getAttribute('data-value');
       const options = {
         el: $el,
-        scroll: scroll === 'true'
+        scroll: scroll === 'true',
+        newLine: newLine === 'true'
       };
+
+      if (value && value.length) {
+        options.value = value;
+      }
+
       $el.mathjaxEditor = new MathJaxEditorKeyboard(options);
     });
 });
