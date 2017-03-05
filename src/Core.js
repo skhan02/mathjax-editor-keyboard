@@ -1,4 +1,5 @@
 const MathJaxEditor = require('mathjax-editor');
+const PerfectScrollbar = require('perfect-scrollbar');
 const Keys = require('./Keys');
 const { addClass, removeClass } = require('mathjax-editor/src/utils');
 const { applyStyles, emptyElement, findNode, findClass } = require('./utils');
@@ -39,9 +40,11 @@ class Core {
     this.$keyboard = $keyboard;
     this.$editorContainer = mathjaxEditor.core.$container;
     this.$editorInput = mathjaxEditor.core.$input;
+    this.$editorDisplay = mathjaxEditor.core.$display;
 
     document.addEventListener('mousedown', this.handleDocumentClick.bind(this));
 
+    this.setupScrollbar();
     this.hideKeyboard();
   }
 
@@ -214,6 +217,23 @@ class Core {
       left,
       top,
       width
+    });
+  }
+
+  /**
+   * Setup PerfectScrollbar.
+   * 
+   * @return {Void}
+   */
+  setupScrollbar() {
+    const { mathjaxEditor, $editorDisplay } = this;
+    addClass($editorDisplay, 'Mathjax_KeyboardDisplay');
+    PerfectScrollbar.initialize($editorDisplay); 
+    mathjaxEditor.on('change', () => {
+      PerfectScrollbar.update($editorDisplay);
+    });
+    $editorDisplay.addEventListener('scroll', () => {
+      editor.core.update();
     });
   }
   

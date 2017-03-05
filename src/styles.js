@@ -1,5 +1,7 @@
+const perfectScrollbarStyles = require('./perfectScrollbarStyles');
+
 function onLoad() {
-  const styles = {
+  MathJax.Ajax.Styles({
     '.mjk-container': {
       'background-color': 'rgba(0, 0, 0, 0.5)',
       'border-radius': '5px',
@@ -122,10 +124,14 @@ function onLoad() {
 
     '.Mathjax_KeyboardIcon_Left': {
       'background-position': '-16px -32px'
-    }
-  };
+    },
 
-  MathJax.Ajax.Styles(styles);
+    '.Mathjax_KeyboardDisplay': {
+      'position': 'relative'
+    }
+  });
+
+  MathJax.Ajax.Styles(perfectScrollbarStyles);
 }
 
 window.addEventListener('load', onLoad);

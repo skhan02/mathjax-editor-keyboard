@@ -25,6 +25,7 @@
     "url": "https://github.com/ianlucas/mathjax-editor-keyboard/issues"
   },
   "dependencies": {
-    "mathjax-editor": "1.3.6"
+    "mathjax-editor": "1.3.7",
+    "perfect-scrollbar": "^0.6.16"
   }
 }
