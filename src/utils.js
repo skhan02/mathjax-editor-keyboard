@@ -62,7 +62,7 @@ module.exports = {
       if (!$parent) {
         return false;
       }
-      if ($parent.className && ~$parent.className.indexOf(className)) {
+      if ($parent.className && $parent.className.indexOf && ~$parent.className.indexOf(className)) {
         return true;
       }
       $parent = $parent.parentNode;
