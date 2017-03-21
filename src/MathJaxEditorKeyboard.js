@@ -72,7 +72,7 @@ window.addEventListener('load', () => {
         el: $el,
         scroll: scroll === 'true',
         newLine: newLine === 'true',
-        keyboardZIndexs
+        keyboardZIndex
       };
 
       if (value && value.length) {
