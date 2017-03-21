@@ -12,6 +12,7 @@ class MathJaxEditorKeyboard {
   constructor(options) {
     const core = new Core(options);
 
+    this.core = core;
     this.mathjaxEditor = core.mathjaxEditor;
     this.version = '1.2.1';
   }
@@ -45,6 +46,15 @@ class MathJaxEditorKeyboard {
   on(type, listener) {
     this.mathjaxEditor.on(type, listener);
   }
+
+  /**
+   * Destroys the editor's keyboard.
+   * 
+   * @return {Void}
+   */
+  destroy() {
+    this.core.destroy();
+  }
 }
 
 /**
@@ -56,10 +66,13 @@ window.addEventListener('load', () => {
       const scroll = $el.getAttribute('data-scroll');
       const newLine = $el.getAttribute('data-new-line');
       const value = $el.getAttribute('data-value');
+      const keyboardZIndex = $el.getAttribute('data-keyboard-z-index');
+
       const options = {
         el: $el,
         scroll: scroll === 'true',
-        newLine: newLine === 'true'
+        newLine: newLine === 'true',
+        keyboardZIndexs
       };
 
       if (value && value.length) {

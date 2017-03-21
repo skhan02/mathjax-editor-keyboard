@@ -27,6 +27,9 @@ class Core {
     $container.appendChild($arrow);
     document.body.appendChild($container);
 
+    $keyboard.style.zIndex = options.keyboardZIndex;
+    $arrow.style.zIndex = options.keyboardZIndex;
+
     const mathjaxEditor = new MathJaxEditor(options);
 
     this.mathjaxEditor = mathjaxEditor;
@@ -329,6 +332,15 @@ class Core {
     
     this.pageIndex = index;
     this.render();
+  }
+
+  /**
+   * Destroys the keyboard container.
+   * 
+   * @return {Void}
+   */
+  destroy() {
+    document.body.removeChild(this.$container);
   }
 }
 
