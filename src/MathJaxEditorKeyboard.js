@@ -14,7 +14,7 @@ class MathJaxEditorKeyboard {
 
     this.core = core;
     this.mathjaxEditor = core.mathjaxEditor;
-    this.version = '1.2.3';
+    this.version = '1.2.4';
   }
 
   /**

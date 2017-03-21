@@ -1623,6 +1623,10 @@ var Editor = function () {
       var hidden = options.cursorHidden || false;
       var className = 'wasRecentlyPlaced';
 
+      if (!$cursor) {
+        return;
+      }
+
       $cursor.style.display = hidden ? 'none' : 'inline-block';
 
       if (this.lastCursorTimeout) {
@@ -2247,7 +2251,7 @@ var MathJaxEditor = function () {
     var core = new Editor(options);
 
     this.core = core;
-    this.version = '1.3.8';
+    this.version = '1.3.9';
   }
 
   /**
@@ -5561,7 +5565,7 @@ var MathJaxEditorKeyboard = function () {
 
     this.core = core;
     this.mathjaxEditor = core.mathjaxEditor;
-    this.version = '1.2.3';
+    this.version = '1.2.4';
   }
 
   /**
