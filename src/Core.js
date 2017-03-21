@@ -18,9 +18,9 @@ class Core {
   constructor(options) {
     const Element = MathJax.HTML.Element;
 
-    const $container = Element('div', { className: 'mjk-container' });
-    const $keyboard = Element('div', { className: 'mjk-keyboard' });
-    const $arrow = Element('div', { className: 'mjk-arrow' });
+    const $container = Element('div', { className: 'Mathjax_KeyboardContainer' });
+    const $keyboard = Element('div', { className: 'Mathjax_KeyboardKeyboard' });
+    const $arrow = Element('div', { className: 'Mathjax_KeyboardArrow' });
     const viewportWidth = window.innerWidth;
 
     $container.appendChild($keyboard);
@@ -69,13 +69,13 @@ class Core {
     $keyboard.style.width = `${keyboardWidth}px`;
 
     keys.forEach((rows, i) => {
-      const $row = Element('div', { className: 'mjk-keyRow' });
+      const $row = Element('div', { className: 'Mathjax_KeyboardKeyRow' });
 
       rows.forEach((column, j) => {
         const key = Keys.getKey(pageIndex, i, j);
 
         const $key = Element('button', {
-          className: 'mjk-key',
+          className: 'Mathjax_KeyboardKey',
           style: {
             fontSize: '16px',
             height: keyWidthPx,
@@ -131,7 +131,7 @@ class Core {
       $editorInput.setAttribute('readonly', 'true');
       $container.appendChild($editorContainer);
       $container.appendChild($cursor);
-      addClass($editorContainer, 'mjk-input');
+      addClass($editorContainer, 'Mathjax_KeyboardInput');
       addClass($keyboard, 'isMobile');
       removeClass($keyboard, 'isDesktop');
 
@@ -170,7 +170,7 @@ class Core {
    */
   appendEditorNextToTargetElement() {
     const { $editorContainer, $el } = this;
-    removeClass($editorContainer, 'mjk-input');
+    removeClass($editorContainer, 'Mathjax_KeyboardInput');
     $el.parentNode.insertBefore($editorContainer, $el.nextSibling);
   }
 
@@ -289,7 +289,7 @@ class Core {
     if (findNode($target, $editorContainer)) {
       return this.showKeyboard();
     }
-    if (!findNode($target, $container) && !findClass($target, 'mjk-key')) {
+    if (!findNode($target, $container) && !findClass($target, 'Mathjax_KeyboardKey')) {
       return this.hideKeyboard();
     }
   }

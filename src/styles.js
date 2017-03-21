@@ -2,7 +2,7 @@ const perfectScrollbarStyles = require('./perfectScrollbarStyles');
 
 function onLoad() {
   MathJax.Ajax.Styles({
-    '.mjk-container': {
+    '.Mathjax_KeyboardContainer': {
       'background-color': 'rgba(0, 0, 0, 0.5)',
       'border-radius': '5px',
       height: '100%',
@@ -12,7 +12,7 @@ function onLoad() {
       width: '100%'
     },
 
-    '.mjk-arrow, .mjk-arrow:after, .mjk-arrow:before': {
+    '.Mathjax_KeyboardArrow, .Mathjax_KeyboardArrow:after, .Mathjax_KeyboardArrow:before': {
       'border-left': '20px solid transparent',
       'border-right': '20px solid transparent',
       'border-bottom': '20px solid #fff',
@@ -22,19 +22,19 @@ function onLoad() {
       'top': '-18px'
     },
 
-    '.mjk-arrow:after': {
+    '.Mathjax_KeyboardArrow:after': {
       'left': '-20px',
       'top': 0
     },
 
-    '.mjk-arrow:before': {
+    '.Mathjax_KeyboardArrow:before': {
       'top': '-3px',
       'left': '-23px',
       'border-bottom-color': '#ccc',
       'border-width': '23px'
     },
 
-    '.mjk-keyboard': {  
+    '.Mathjax_KeyboardKeyboard': {  
       'background-color': '#fff',
       border: '1px solid #ccc',
       bottom: 0,
@@ -45,29 +45,29 @@ function onLoad() {
       width: '320px'
     },
 
-    '.mjk-keyboard.isMobile': {
+    '.Mathjax_KeyboardKeyboard.isMobile': {
       border: 'none',
       'border-top': '1px solid #ccc'
     },
 
-    '.mjk-keyboard.isDesktop': {
+    '.Mathjax_KeyboardKeyboard.isDesktop': {
       'border-width': '2px'
     },
 
-    '.mjk-keyRow': {
+    '.Mathjax_KeyboardKeyRow': {
       'align-items': 'center',    
       display: 'flex',
       'justify-content': 'center',
       'overflow': 'hidden'
     },
 
-    '.mjk-keyRow:last-child': {
+    '.Mathjax_KeyboardKeyRow:last-child': {
       'border-top': '2px solid #f1f1f1',
       'margin-top': '0.5em',
       'padding-top': '0.5em'
     },
 
-    '.mjk-key': {
+    '.Mathjax_KeyboardKey': {
       'align-items': 'center',
       'background-color': 'transparent',
       border: 'none',
@@ -78,17 +78,17 @@ function onLoad() {
       'text-align': 'center'
     },
 
-    '.mjk-key *': {
+    '.Mathjax_KeyboardKey *': {
       'outline': 'none'
     },
 
-    '.mjk-input': {
+    '.Mathjax_KeyboardInput': {
       'background-color': '#fff',
       position: 'absolute !important',
       'overflow-x': 'scroll'
     },
 
-    '.mjk-input .mj-ed-display': {
+    '.Mathjax_KeyboardInput .Mathjax_EditorDisplay': {
       border: 'none !important'
     },
 
