@@ -1000,14 +1000,17 @@ var Core = function () {
 
     var Element = MathJax.HTML.Element;
 
-    var $container = Element('div', { className: 'mjk-container' });
-    var $keyboard = Element('div', { className: 'mjk-keyboard' });
-    var $arrow = Element('div', { className: 'mjk-arrow' });
+    var $container = Element('div', { className: 'Mathjax_KeyboardContainer' });
+    var $keyboard = Element('div', { className: 'Mathjax_KeyboardKeyboard' });
+    var $arrow = Element('div', { className: 'Mathjax_KeyboardArrow' });
     var viewportWidth = window.innerWidth;
 
     $container.appendChild($keyboard);
     $container.appendChild($arrow);
     document.body.appendChild($container);
+
+    $keyboard.style.zIndex = options.keyboardZIndex;
+    $arrow.style.zIndex = options.keyboardZIndex;
 
     var mathjaxEditor = new MathJaxEditor(options);
 
@@ -1057,13 +1060,13 @@ var Core = function () {
       $keyboard.style.width = keyboardWidth + 'px';
 
       keys.forEach(function (rows, i) {
-        var $row = Element('div', { className: 'mjk-keyRow' });
+        var $row = Element('div', { className: 'Mathjax_KeyboardKeyRow' });
 
         rows.forEach(function (column, j) {
           var key = Keys.getKey(pageIndex, i, j);
 
           var $key = Element('button', {
-            className: 'mjk-key',
+            className: 'Mathjax_KeyboardKey',
             style: {
               fontSize: '16px',
               height: keyWidthPx,
@@ -1122,7 +1125,7 @@ var Core = function () {
         $editorInput.setAttribute('readonly', 'true');
         $container.appendChild($editorContainer);
         $container.appendChild($cursor);
-        addClass($editorContainer, 'mjk-input');
+        addClass($editorContainer, 'Mathjax_KeyboardInput');
         addClass($keyboard, 'isMobile');
         removeClass($keyboard, 'isDesktop');
 
@@ -1165,7 +1168,7 @@ var Core = function () {
       var $editorContainer = this.$editorContainer,
           $el = this.$el;
 
-      removeClass($editorContainer, 'mjk-input');
+      removeClass($editorContainer, 'Mathjax_KeyboardInput');
       $el.parentNode.insertBefore($editorContainer, $el.nextSibling);
     }
 
@@ -1314,7 +1317,7 @@ var Core = function () {
       if (findNode($target, $editorContainer)) {
         return this.showKeyboard();
       }
-      if (!findNode($target, $container) && !findClass($target, 'mjk-key')) {
+      if (!findNode($target, $container) && !findClass($target, 'Mathjax_KeyboardKey')) {
         return this.hideKeyboard();
       }
     }
@@ -1361,6 +1364,18 @@ var Core = function () {
 
       this.pageIndex = index;
       this.render();
+    }
+
+    /**
+     * Destroys the keyboard container.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'destroy',
+    value: function destroy() {
+      document.body.removeChild(this.$container);
     }
   }]);
 
@@ -5297,7 +5312,7 @@ var perfectScrollbarStyles = __webpack_require__(34);
 
 function onLoad() {
   MathJax.Ajax.Styles({
-    '.mjk-container': {
+    '.Mathjax_KeyboardContainer': {
       'background-color': 'rgba(0, 0, 0, 0.5)',
       'border-radius': '5px',
       height: '100%',
@@ -5307,7 +5322,7 @@ function onLoad() {
       width: '100%'
     },
 
-    '.mjk-arrow, .mjk-arrow:after, .mjk-arrow:before': {
+    '.Mathjax_KeyboardArrow, .Mathjax_KeyboardArrow:after, .Mathjax_KeyboardArrow:before': {
       'border-left': '20px solid transparent',
       'border-right': '20px solid transparent',
       'border-bottom': '20px solid #fff',
@@ -5317,19 +5332,19 @@ function onLoad() {
       'top': '-18px'
     },
 
-    '.mjk-arrow:after': {
+    '.Mathjax_KeyboardArrow:after': {
       'left': '-20px',
       'top': 0
     },
 
-    '.mjk-arrow:before': {
+    '.Mathjax_KeyboardArrow:before': {
       'top': '-3px',
       'left': '-23px',
       'border-bottom-color': '#ccc',
       'border-width': '23px'
     },
 
-    '.mjk-keyboard': {
+    '.Mathjax_KeyboardKeyboard': {
       'background-color': '#fff',
       border: '1px solid #ccc',
       bottom: 0,
@@ -5340,29 +5355,29 @@ function onLoad() {
       width: '320px'
     },
 
-    '.mjk-keyboard.isMobile': {
+    '.Mathjax_KeyboardKeyboard.isMobile': {
       border: 'none',
       'border-top': '1px solid #ccc'
     },
 
-    '.mjk-keyboard.isDesktop': {
+    '.Mathjax_KeyboardKeyboard.isDesktop': {
       'border-width': '2px'
     },
 
-    '.mjk-keyRow': {
+    '.Mathjax_KeyboardKeyRow': {
       'align-items': 'center',
       display: 'flex',
       'justify-content': 'center',
       'overflow': 'hidden'
     },
 
-    '.mjk-keyRow:last-child': {
+    '.Mathjax_KeyboardKeyRow:last-child': {
       'border-top': '2px solid #f1f1f1',
       'margin-top': '0.5em',
       'padding-top': '0.5em'
     },
 
-    '.mjk-key': {
+    '.Mathjax_KeyboardKey': {
       'align-items': 'center',
       'background-color': 'transparent',
       border: 'none',
@@ -5373,17 +5388,17 @@ function onLoad() {
       'text-align': 'center'
     },
 
-    '.mjk-key *': {
+    '.Mathjax_KeyboardKey *': {
       'outline': 'none'
     },
 
-    '.mjk-input': {
+    '.Mathjax_KeyboardInput': {
       'background-color': '#fff',
       position: 'absolute !important',
       'overflow-x': 'scroll'
     },
 
-    '.mjk-input .mj-ed-display': {
+    '.Mathjax_KeyboardInput .Mathjax_EditorDisplay': {
       border: 'none !important'
     },
 
@@ -5543,8 +5558,9 @@ var MathJaxEditorKeyboard = function () {
 
     var core = new Core(options);
 
+    this.core = core;
     this.mathjaxEditor = core.mathjaxEditor;
-    this.version = '1.2.1';
+    this.version = '1.2.2';
   }
 
   /**
@@ -5586,6 +5602,18 @@ var MathJaxEditorKeyboard = function () {
     value: function on(type, listener) {
       this.mathjaxEditor.on(type, listener);
     }
+
+    /**
+     * Destroys the editor's keyboard.
+     * 
+     * @return {Void}
+     */
+
+  }, {
+    key: 'destroy',
+    value: function destroy() {
+      this.core.destroy();
+    }
   }]);
 
   return MathJaxEditorKeyboard;
@@ -5601,10 +5629,13 @@ window.addEventListener('load', function () {
     var scroll = $el.getAttribute('data-scroll');
     var newLine = $el.getAttribute('data-new-line');
     var value = $el.getAttribute('data-value');
+    var keyboardZIndex = $el.getAttribute('data-keyboard-z-index');
+
     var options = {
       el: $el,
       scroll: scroll === 'true',
-      newLine: newLine === 'true'
+      newLine: newLine === 'true',
+      keyboardZIndex: keyboardZIndex
     };
 
     if (value && value.length) {
