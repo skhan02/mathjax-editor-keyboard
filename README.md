@@ -18,6 +18,6 @@ See the api on [MathJax Editor documentation](https://ianlucas.github.io/mathjax
 
 ## Browser Support
 
-Tested on recent Chrome, Firefox and Internet Explorer 9 with **babel-polyfill** and **flexibility.js**.
+Tested on recent Chrome, Firefox and Internet Explorer 9 with [babel-polyfill](https://babeljs.io/docs/usage/polyfill) and [flexibility.js](https://github.com/jonathantneal/flexibility).
 
 **License:** MIT
