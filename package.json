@@ -1,31 +1,30 @@
 {
-  "name": "mathboard",
-  "version": "1.0.0",
-  "description": "A keyboard for MathJax editor.",
-  "main": "dist/Mathboard.js",
+  "name": "mathjax-editor-keyboard",
+  "version": "2.0.0-beta",
+  "description": "A keyboard for MathJax Editor.",
+  "main": "dist/MathJaxEditorKeyboard.js",
   "scripts": {
     "dev": "webpack-dev-server --host 0.0.0.0",
-    "build": "webpack && uglifyjs ./dist/Mathboard.js -c -m -o ./dist/Mathboard.min.js",
+    "build": "webpack && uglifyjs ./dist/MathJaxEditorKeyboard.js -c -m -o ./dist/MathJaxEditorKeyboard.min.js",
     "test": "jest"
   },
   "author": "Ian Lucas <ianlucas_ferreira@hotmail.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ianlucas/mathboard"
+    "url": "https://github.com/ianlucas/mathjax-editor-keyboard"
   },
   "license": "MIT",
   "devDependencies": {
     "babel-core": "^6.26.0",
-    "babel-jest": "^20.0.3",
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.0",
     "uglify-js": "^3.0.28",
     "webpack": "^3.5.5",
     "webpack-dev-server": "^2.7.1"
   },
-  "homepage": "https://github.com/ianlucas/mathboard",
+  "homepage": "https://github.com/ianlucas/mathjax-editor-keyboard",
   "bugs": {
-    "url": "https://github.com/ianlucas/mathboard/issues"
+    "url": "https://github.com/ianlucas/mathjax-editor-keyboard/issues"
   },
   "dependencies": {
     "mathjax-editor": "^2.0.0-beta2"

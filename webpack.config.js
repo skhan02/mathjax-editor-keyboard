@@ -3,8 +3,8 @@ const webpack = require('webpack')
 
 const banner =
 `
-Mathboard
-http://github.com/ianlucas/mathboard
+MathJax Editor Keyboard
+http://github.com/ianlucas/mathjax-editor-keyboard
 
 by Ian Lucas
 Released under the MIT license.
@@ -15,8 +15,8 @@ module.exports = {
 
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'Mathboard.js',
-    library: 'Mathboard',
+    filename: 'MathJaxEditorKeyboard.js',
+    library: 'MathJaxEditorKeyboard',
     libraryTarget: 'umd',
     libraryExport: 'default'
   },

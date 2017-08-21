@@ -16,7 +16,7 @@ import layout from './layout'
 import renderKeyboard from './render-keyboard'
 import renderControls from './render-controls'
 
-export default class Mathboard extends MathJaxEditor {
+export default class MathJaxEditorKeyboard extends MathJaxEditor {
   constructor(selector, options) {
     super(selector, options)
 
