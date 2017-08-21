@@ -5,11 +5,16 @@ export default {
 
   '.mathboard-keyboard': {
     'background-color': '#f1f1f1',
-    'padding': '0.5em 0'
+    'padding': '0.5em 0',
+    'transition': 'all 200ms ease-out'
   },
 
   '.mathboard-line': {
     'align-items': 'center',
+    '-js-display': 'flex',
+    'display': '-webkit-box',
+    'display': '-moz-box',
+    'display': '-ms-flexbox',
     'display': 'flex',
     'height': '36px',
     'justify-content': 'center',
