@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Mathboard</title>
+  <style>
+    body {
+      font-size: 32px;
+    }
+
+    .mathjax-editor-display {
+      border: 1px solid #ccc;
+    }
+    
+    .mathjax-editor-display.is-focused {
+      border-color: #007fff;
+    }
+  </style>
+
+</head>
+<body>
+  <textarea id="myEditor"></textarea>
+
+  <script type='text/x-mathjax-config'>
+    MathJax.Hub.Config({
+      showMathMenu: false,
+      messageStyle: 'none'
+    });
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.26.0/polyfill.min.js"></script>
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <script src="Mathboard.js"></script>
+  <script>
+    window.onload = function () {
+      window.editor = new Mathboard('#myEditor', {
+        allowNewlines: true
+      })
+    }
+  </script>
+</body>
+</html>
