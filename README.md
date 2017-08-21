@@ -16,4 +16,8 @@ const editor = new MathJaxEditorKeyboard('#myEditor')
 
 See the api on [MathJax Editor documentation](https://ianlucas.github.io/mathjax-editor), as this editor simply extends it.
 
+## Browser Support
+
+Tested on recent Chrome, Firefox and Internet Explorer 9 with **babel-polyfill** and **flexibility.js**.
+
 **License:** MIT
