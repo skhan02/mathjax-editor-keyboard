@@ -276,7 +276,7 @@ var MathJaxEditorKeyboard = function (_MathJaxEditor) {
     var _this = _possibleConstructorReturn(this, (MathJaxEditorKeyboard.__proto__ || Object.getPrototypeOf(MathJaxEditorKeyboard)).call(this, selector, options));
 
     _this.mathjaxEditorVersion = _this.version;
-    _this.version = '2.0.0-beta';
+    _this.version = '2.0.0-beta2';
 
     var $editorContainer = _this.core.$container;
     var $container = (0, _createElement2.default)('div', 'mathboard');
@@ -321,11 +321,9 @@ var MathJaxEditorKeyboard = function (_MathJaxEditor) {
     var handleFocus = function handleFocus() {
       handleResize();
       (0, _showElement2.default)($keyboard);
-      setTimeout(function () {
-        _this.core.update();
-        renderLayer();
-        handleResize();
-      });
+      renderLayer();
+      handleResize();
+      _this.core.update();
     };
 
     var handleBlur = function handleBlur() {
@@ -1292,7 +1290,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
           _classCallCheck(this, MathJaxEditor);
 
           this.core = new _editor2.default(selectors, options);
-          this.version = '2.0.0-beta2';
+          this.version = '2.0.0-beta3';
 
           this.core.on('@input', this.insert.bind(this));
         }
@@ -1823,7 +1821,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
           this.blinker = new _blinker2.default(this.$caret);
           this.placeholder = options.placeholder || 'Start typing...';
           this.allowNewlines = options.allowNewlines || false;
-          this.handleResize = (0, _debounce2.default)(this.handleResize.bind(this), 25);
+          this.handleResize = (0, _debounce2.default)(this.handleResize.bind(this), 250);
           this.scrollToCaret = this.scrollToCaret.bind(this);
 
           (0, _hideElement2.default)(this.$caret);
@@ -4780,7 +4778,6 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
           // Newlines are allowed only as child of the <math> element.
 
-          var $math = $mspace.parentNode;
           var $previous = $mspace.previousElementSibling;
           var $next = $mspace.nextElementSibling;
 
@@ -4870,7 +4867,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
        * @return {Void}
        */
       function unlistenElement($el, type, listener) {
-        return $el.removeEventListener($el, type, listener);
+        return $el.removeEventListener(type, listener);
       }
 
       /***/
@@ -5232,7 +5229,7 @@ exports.default = unlistenElement;
  * @return {Void}
  */
 function unlistenElement($el, type, listener) {
-  return $el.removeEventListener($el, type, listener);
+  return $el.removeEventListener(type, listener);
 }
 
 /***/ }),
@@ -5245,7 +5242,7 @@ function unlistenElement($el, type, listener) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = [[[['o', '('], ['o', ')'], ['o', '|'], ['o', '['], ['o', ']'], ['m', 'insertSqrt', '\\sqrt{a}'], null, ['o', '\\geq']], [['i', 'x'], ['n', '7'], ['n', '8'], ['n', '9'], ['m', 'insertFraction', '\\frac{a}{b}'], ['m', 'insertSuperscript', 'a^b'], ['m', 'insertSubscript', 'a_b'], ['o', '\\leq']], [['i', 'y'], ['n', '4'], ['n', '5'], ['n', '6'], ['i', '\\sin'], ['i', '\\cos'], ['i', '\\tan'], ['o', '>']], [['i', 'z'], ['n', '1'], ['n', '2'], ['n', '3'], ['o', '-'], ['o', '+'], ['o', '\\div'], ['o', '<']], [null, ['o', ','], ['n', '0'], ['o', '.'], null, ['o', '%', '\\%'], ['o', '='], ['o', '\\pm']]], [[['i', 'a'], ['i', 'b'], ['i', 'c'], ['i', 'd'], ['i', 'e'], ['i', 'f'], ['i', 'g'], ['i', 'h']], [['i', 'i'], ['i', 'j'], ['i', 'k'], ['i', 'l'], ['i', 'm'], ['i', 'n'], ['i', 'o'], ['i', 'p']], [['i', 'q'], ['i', 'r'], ['i', 's'], ['i', 't'], ['i', 'u'], ['i', 'v'], ['i', 'w'], ['i', 'x']], [['i', 'y'], ['i', 'z'], ['i', '\\alpha'], ['i', '\\beta'], ['i', '\\Gamma'], ['i', '\\gamma'], ['i', '\\Delta'], ['i', '\\delta']], [['i', '\\epsilon'], ['i', '\\varepsilon'], ['i', '\\zeta'], ['i', '\\eta'], ['i', '\\Theta'], ['i', '\\theta'], ['i', '\\vartheta'], ['i', '\\iota']]], [[['i', '\\kappa'], ['i', '\\varkappa'], ['i', '\\Lambda'], ['i', '\\lambda'], ['i', '\\mu'], ['i', '\\nu'], ['i', '\\Xi'], ['i', '\\xi']], [['i', '\\Pi'], ['i', '\\pi'], ['i', '\\varpi'], ['i', '\\rho'], ['i', '\\varrho'], ['i', '\\Sigma'], ['i', '\\sigma'], ['i', '\\varsigma']], [['i', '\\tau'], ['i', '\\Upsilon'], ['i', '\\upsilon'], ['i', '\\Phi'], ['i', '\\phi'], ['i', '\\varphi'], ['i', '\\chi'], ['i', '\\Psi']], [['i', '\\psi'], ['i', '\\omega'], ['i', '\\Omega'], ['i', '\\partial'], ['i', '\\eth'], ['i', '\\hbar'], ['i', '\\imath'], ['i', '\\jmath']], [['i', '\\infty'], ['i', '\\ell']]]];
+exports.default = [[[['o', '('], ['o', ')'], ['o', '|'], ['o', '['], ['o', ']'], ['m', 'insertSqrt', '\\sqrt{a}'], ['m', 'insertRoot', '\\sqrt[n]{a}'], ['o', '\\geq']], [['i', 'x'], ['n', '7'], ['n', '8'], ['n', '9'], ['m', 'insertFraction', '\\frac{a}{b}'], ['m', 'insertSuperscript', 'a^b'], ['m', 'insertSubscript', 'a_b'], ['o', '\\leq']], [['i', 'y'], ['n', '4'], ['n', '5'], ['n', '6'], ['i', '\\sin'], ['i', '\\cos'], ['i', '\\tan'], ['o', '>']], [['i', 'z'], ['n', '1'], ['n', '2'], ['n', '3'], ['o', '-'], ['o', '+'], ['o', '\\div'], ['o', '<']], [null, ['o', ','], ['n', '0'], ['o', '.'], null, ['o', '%', '\\%'], ['o', '='], ['o', '\\pm']]], [[['i', 'a'], ['i', 'b'], ['i', 'c'], ['i', 'd'], ['i', 'e'], ['i', 'f'], ['i', 'g'], ['i', 'h']], [['i', 'i'], ['i', 'j'], ['i', 'k'], ['i', 'l'], ['i', 'm'], ['i', 'n'], ['i', 'o'], ['i', 'p']], [['i', 'q'], ['i', 'r'], ['i', 's'], ['i', 't'], ['i', 'u'], ['i', 'v'], ['i', 'w'], ['i', 'x']], [['i', 'y'], ['i', 'z'], ['i', '\\alpha'], ['i', '\\beta'], ['i', '\\Gamma'], ['i', '\\gamma'], ['i', '\\Delta'], ['i', '\\delta']], [['i', '\\epsilon'], ['i', '\\varepsilon'], ['i', '\\zeta'], ['i', '\\eta'], ['i', '\\Theta'], ['i', '\\theta'], ['i', '\\vartheta'], ['i', '\\iota']]], [[['i', '\\kappa'], ['i', '\\varkappa'], ['i', '\\Lambda'], ['i', '\\lambda'], ['i', '\\mu'], ['i', '\\nu'], ['i', '\\Xi'], ['i', '\\xi']], [['i', '\\Pi'], ['i', '\\pi'], ['i', '\\varpi'], ['i', '\\rho'], ['i', '\\varrho'], ['i', '\\Sigma'], ['i', '\\sigma'], ['i', '\\varsigma']], [['i', '\\tau'], ['i', '\\Upsilon'], ['i', '\\upsilon'], ['i', '\\Phi'], ['i', '\\phi'], ['i', '\\varphi'], ['i', '\\chi'], ['i', '\\Psi']], [['i', '\\psi'], ['i', '\\omega'], ['i', '\\Omega'], ['i', '\\partial'], ['i', '\\eth'], ['i', '\\hbar'], ['i', '\\imath'], ['i', '\\jmath']], [['i', '\\infty'], ['i', '\\ell']]]];
 
 /***/ }),
 /* 16 */
@@ -5383,9 +5380,9 @@ exports.default = {
   },
 
   '.mathboard-keyboard': {
-    'background-color': '#f1f1f1',
-    'padding': '0.5em 0',
-    'transition': 'all 200ms ease-out'
+    'background-color': '#fcfcfc',
+    'box-shadow': '0 2px 5px rgba(0, 0, 0, 0.25)',
+    'padding': '0.5em 0'
   },
 
   '.mathboard-line': (_mathboardLine = {
@@ -5398,14 +5395,27 @@ exports.default = {
     'margin-top': '0.5em'
   },
 
+  '.mathboard-key, .mathboard-key *': {
+    'outline': 'none'
+  },
+
   '.mathboard-key': {
     'background': 'transparent',
-    'border': 'none',
+    'border': '1px solid transparent',
+    'border-radius': '3px',
     'font-size': '14px',
     'height': '36px',
     'overflow': 'hidden',
     'text-align': 'center',
     'width': '36px'
+  },
+
+  '.mathboard-key:hover': {
+    'box-shadow': '0 2px 5px rgba(0, 0, 0, 0.25)'
+  },
+
+  '.mathboard-key:active': {
+    'box-shadow': '0 2px 5px rgba(0, 0, 0, 0.25) inset'
   },
 
   '.mathboard-icon': {
