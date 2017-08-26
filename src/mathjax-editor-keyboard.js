@@ -21,7 +21,7 @@ export default class MathJaxEditorKeyboard extends MathJaxEditor {
     super(selector, options)
 
     this.mathjaxEditorVersion = this.version
-    this.version = '2.0.0-beta'
+    this.version = '2.0.0-beta2'
 
     const $editorContainer = this.core.$container
     const $container = createElement('div', 'mathboard')
