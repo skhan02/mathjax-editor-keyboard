@@ -67,11 +67,9 @@ export default class MathJaxEditorKeyboard extends MathJaxEditor {
     const handleFocus = () => {
       handleResize()
       showElement($keyboard)
-      setTimeout(() => {
-        this.core.update()
-        renderLayer()
-        handleResize()
-      })
+      renderLayer()
+      handleResize()
+      this.core.update()
     }
 
     const handleBlur = () => {
