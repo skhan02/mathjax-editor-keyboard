@@ -4,7 +4,8 @@ export default {
   },
 
   '.mathboard-keyboard': {
-    'background-color': '#f1f1f1',
+    'background-color': '#fcfcfc',
+    'box-shadow': '0 2px 5px rgba(0, 0, 0, 0.25)',
     'padding': '0.5em 0',
     'transition': 'all 200ms ease-out'
   },
@@ -25,14 +26,27 @@ export default {
     'margin-top': '0.5em'
   },
 
+  '.mathboard-key, .mathboard-key *': {
+    'outline': 'none'
+  },
+
   '.mathboard-key': {
     'background': 'transparent',
-    'border': 'none',
+    'border': '1px solid transparent',
+    'border-radius': '3px',
     'font-size': '14px',
     'height': '36px',
     'overflow': 'hidden', 
     'text-align': 'center',
     'width': '36px'
+  },
+
+  '.mathboard-key:hover': {
+    'box-shadow': '0 2px 5px rgba(0, 0, 0, 0.25)'
+  },
+
+  '.mathboard-key:active': {
+    'box-shadow': '0 2px 5px rgba(0, 0, 0, 0.25) inset'
   },
 
   '.mathboard-icon': {
