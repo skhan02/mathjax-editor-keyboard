@@ -1,6 +1,6 @@
 export default [
   [
-    [['o', '('], ['o', ')'], ['o', '|'], ['o', '['], ['o', ']'], ['m', 'insertSqrt', '\\sqrt{a}'], null, ['o', '\\geq']],
+    [['o', '('], ['o', ')'], ['o', '|'], ['o', '['], ['o', ']'], ['m', 'insertSqrt', '\\sqrt{a}'], ['m', 'insertRoot', '\\sqrt[n]{a}'], ['o', '\\geq']],
     [['i', 'x'], ['n', '7'], ['n', '8'], ['n', '9'], ['m', 'insertFraction', '\\frac{a}{b}'], ['m', 'insertSuperscript', 'a^b'], ['m', 'insertSubscript', 'a_b'], ['o', '\\leq']],
     [['i', 'y'], ['n', '4'], ['n', '5'], ['n', '6'], ['i', '\\sin'], ['i', '\\cos'], ['i', '\\tan'], ['o', '>']],
     [['i', 'z'], ['n', '1'], ['n', '2'], ['n', '3'], ['o', '-'], ['o', '+'], ['o', '\\div'], ['o', '<']],
