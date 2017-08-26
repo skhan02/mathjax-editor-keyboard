@@ -26,6 +26,6 @@
     "url": "https://github.com/ianlucas/mathjax-editor-keyboard/issues"
   },
   "dependencies": {
-    "mathjax-editor": "^2.0.0-beta2"
+    "mathjax-editor": "^2.0.0-beta3"
   }
 }
