@@ -6,8 +6,7 @@ export default {
   '.mathboard-keyboard': {
     'background-color': '#fcfcfc',
     'box-shadow': '0 2px 5px rgba(0, 0, 0, 0.25)',
-    'padding': '0.5em 0',
-    'transition': 'all 200ms ease-out'
+    'padding': '0.5em 0'
   },
 
   '.mathboard-line': {
